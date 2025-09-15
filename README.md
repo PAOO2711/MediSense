@@ -1,22 +1,68 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MediSense Project
 
-## Getting Started
+Este proyecto está organizado en dos partes principales: frontend y backend.
 
-First, run the development server:
+## 📁 Estructura del Proyecto
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+```
+medisense/
+├── frontend/          # Aplicación Next.js
+│   ├── app/          # App Router de Next.js
+│   ├── components/   # Componentes React
+│   ├── hooks/        # Custom hooks
+│   ├── lib/          # Utilidades
+│   ├── public/       # Archivos estáticos
+│   └── ...          # Archivos de configuración
+├── backend/          # API Python con FastAPI
+│   ├── app/
+│   │   ├── api/      # Endpoints de la API
+│   │   ├── core/     # Configuración
+│   │   ├── models/   # Modelos de datos
+│   │   └── services/ # Lógica de negocio
+│   ├── tests/        # Tests del backend
+│   └── requirements.txt
+└── README.md
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🚀 Desarrollo
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Frontend (Next.js)
+```bash
+cd frontend
+npm install
+npm run dev
+```
+- Aplicación disponible en: http://localhost:3000
+
+### Backend (FastAPI)
+```bash
+cd backend
+pip install -r requirements.txt
+python main.py
+```
+- API disponible en: http://localhost:8000
+- Documentación automática: http://localhost:8000/docs
+
+## 🔧 Configuración
+
+### Frontend
+- Framework: Next.js 15 con TypeScript
+- UI: shadcn/ui + Tailwind CSS
+- Tema: Modo oscuro/claro con next-themes
+
+### Backend
+- Framework: FastAPI
+- Base de datos: SQLAlchemy (configurable)
+- Autenticación: JWT
+- CORS configurado para desarrollo
+
+## 📊 Funcionalidades
+
+- Dashboard médico interactivo
+- Modo oscuro/claro
+- API REST para datos médicos
+- Sistema de autenticación (preparado)
+- Componentes UI reutilizables
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
