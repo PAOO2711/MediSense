@@ -78,144 +78,7 @@ def convert_webm_to_wav(webm_data: bytes) -> str:
             os.unlink(wav_path)
         return None
 
-@app.websocket("/ws/record")
-async def websocket_record_endpoint(websocket: WebSocket):
-    """WebSocket para grabación completa"""
-    await websocket.accept()
-    
-    # Verificar que el modelo esté cargado
-    if not model:
-        await websocket.send_text("❌ Modelo no disponible")
-        await websocket.close()
-        return
-    else:
-        await websocket.send_text("✅ Modelo listo - Comenzando grabación")
-    
-    audio_buffer = []
-    
-    try:
-        while True:
-            message = await websocket.receive_text()
-            
-            if message == "start_recording":
-                logging.info("🎙️ Iniciando grabación...")
-                audio_buffer = []
-                await websocket.send_text("🔴 Grabación iniciada")
-            
-            elif message == "stop_recording":
-                logging.info("🛑 Deteniendo grabación...")
-                
-                if not audio_buffer:
-                    await websocket.send_text("⚠️ No hay audio para transcribir")
-                    continue
-                
-                try:
-                    # Combinar todos los chunks de audio
-                    full_audio_data = b"".join(audio_buffer)
-                    logging.info(f"📊 Audio total: {len(full_audio_data)} bytes")
-                    
-                    # Convertir a WAV
-                    wav_path = convert_webm_to_wav(full_audio_data)
-                    
-                    if not wav_path:
-                        await websocket.send_text("❌ Error procesando audio")
-                        continue
-                    
-                    # Transcribir con Whisper
-                    logging.info("🔄 Iniciando transcripción...")
-                    segments, info = model.transcribe(
-                        wav_path,
-                        language="es",
-                        beam_size=5,
-                        temperature=0.2,
-                        word_timestamps=True,  # Incluir timestamps
-                        vad_filter=True,
-                        vad_parameters=dict(
-                            min_silence_duration_ms=500,
-                            threshold=0.5,
-                            min_speech_duration_ms=250
-                        )
-                    )
-                    
-                    # Extraer texto completo y por segmentos
-                    full_transcription = ""
-                    segments_list = []
-                    
-                    for segment in segments:
-                        segment_text = segment.text.strip()
-                        full_transcription += segment_text + " "
-                        
-                        segments_list.append({
-                            "start": round(segment.start, 2),
-                            "end": round(segment.end, 2),
-                            "text": segment_text
-                        })
-                    
-                    full_transcription = full_transcription.strip()
-                    
-                    # Enviar resultado
-                    if full_transcription:
-                        result = {
-                            "type": "transcription_complete",
-                            "full_text": full_transcription,
-                            "segments": segments_list,
-                            "duration": round(info.duration, 2),
-                            "language": info.language,
-                            "language_probability": round(info.language_probability, 2)
-                        }
-                        
-                        await websocket.send_json(result)
-                        logging.info(f"✅ Transcripción completada: {len(full_transcription)} caracteres")
-                    else:
-                        await websocket.send_text("🔇 No se detectó voz en la grabación")
-                    
-                    # Limpiar archivo temporal
-                    os.unlink(wav_path)
-                    
-                except Exception as e:
-                    logging.error(f"❌ Error en transcripción: {e}")
-                    await websocket.send_text(f"❌ Error: {str(e)}")
-                
-                # Limpiar buffer
-                audio_buffer = []
-            
-            elif message.startswith("audio_chunk:"):
-                # Los chunks de audio llegan en formato "audio_chunk:base64_data"
-                # o simplemente recibir bytes directamente
-                pass  # Los chunks se reciben como bytes separados
-                
-    except WebSocketDisconnect:
-        logging.info("Cliente desconectado")
-    except Exception as e:
-        logging.error(f"Error en WebSocket: {e}")
-        await websocket.close()
-
-@app.websocket("/ws/record_data")
-async def websocket_record_data_endpoint(websocket: WebSocket):
-    """WebSocket para recibir datos de audio"""
-    await websocket.accept()
-    
-    audio_buffer = []
-    
-    try:
-        while True:
-            # Recibir chunks de audio como bytes
-            data = await websocket.receive_bytes()
-            audio_buffer.append(data)
-            
-            # Opcional: enviar confirmación cada cierto número de chunks
-            if len(audio_buffer) % 50 == 0:
-                await websocket.send_text(f"📡 Recibidos {len(audio_buffer)} chunks")
-                
-    except WebSocketDisconnect:
-        logging.info("Cliente de datos desconectado")
-        
-        # Guardar audio buffer en una variable global o cache para ser procesado
-        # Por simplicidad, aquí podrías implementar un sistema de cache
-        
-    except Exception as e:
-        logging.error(f"Error en WebSocket de datos: {e}")
-        await websocket.close()
+# WebSocket endpoints removidos - usando solo HTTP POST para simplicidad
 
 @app.post("/transcribe_file")
 async def transcribe_uploaded_file(file: UploadFile = File(...)):
@@ -288,11 +151,9 @@ async def root():
         "message": "🎙️ Servidor de transcripción completa activo",
         "modelo_cargado": model is not None,
         "status": "✅ Funcionando" if model else "⚠️ Sin modelo",
-        "endpoints": {
-            "websocket_record": "/ws/record",
-            "websocket_data": "/ws/record_data", 
-            "upload_file": "/transcribe_file"
-        }
+        "endpoint": "/transcribe_file",
+        "método": "POST",
+        "descripción": "Sube un archivo de audio para transcribir"
     }
 
 if __name__ == "__main__":
