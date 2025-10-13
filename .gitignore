@@ -85,3 +85,6 @@ MANIFEST
 # Temporary files
 *.tmp
 *.temp
+
+# Transcriptions folder
+transcriptions/*
