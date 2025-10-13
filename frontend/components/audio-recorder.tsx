@@ -142,22 +142,7 @@ export default function FullAudioRecorder() {
   const downloadTranscription = () => {
     if (!transcriptionResult) return
 
-    const content = `Transcripción de Audio
-=====================
-
-Texto completo:
-${transcriptionResult.full_text}
-
-Detalles:
-- Duración: ${transcriptionResult.duration}s
-- Idioma: ${transcriptionResult.language} (${(transcriptionResult.language_probability * 100).toFixed(1)}%)
-- Segmentos: ${transcriptionResult.segments.length}
-
-Transcripción por segmentos:
-${transcriptionResult.segments.map(segment => 
-  `[${segment.start}s - ${segment.end}s] ${segment.text}`
-).join('\n')}
-`
+    const content = transcriptionResult.full_text
 
     const blob = new Blob([content], { type: 'text/plain' })
     const url = URL.createObjectURL(blob)
@@ -240,37 +225,11 @@ ${transcriptionResult.segments.map(segment =>
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
-            {/* Información general */}
-            <div className="flex gap-4 text-sm text-gray-600">
-              <span>Duración: {transcriptionResult.duration}s</span>
-              <span>Idioma: {transcriptionResult.language}</span>
-              <span>Confianza: {(transcriptionResult.language_probability * 100).toFixed(1)}%</span>
-              <span>Segmentos: {transcriptionResult.segments.length}</span>
-            </div>
-
-            {/* Texto completo */}
-            <div>
-              <h4 className="font-semibold mb-2">Texto completo:</h4>
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <p className="text-gray-800 leading-relaxed">
-                  {transcriptionResult.full_text}
-                </p>
-              </div>
-            </div>
-
-            {/* Segmentos con timestamps */}
-            <div>
-              <h4 className="font-semibold mb-2">Transcripción por segmentos:</h4>
-              <div className="space-y-2 max-h-64 overflow-y-auto">
-                {transcriptionResult.segments.map((segment, index) => (
-                  <div key={index} className="flex gap-3 p-2 bg-gray-50 rounded">
-                    <span className="text-xs text-gray-500 font-mono min-w-20">
-                      [{segment.start}s - {segment.end}s]
-                    </span>
-                    <span className="text-gray-800">{segment.text}</span>
-                  </div>
-                ))}
-              </div>
+            {/* Solo texto completo de la transcripción */}
+            <div className="bg-gray-50 p-6 rounded-lg">
+              <p className="text-gray-800 leading-relaxed text-lg">
+                {transcriptionResult.full_text}
+              </p>
             </div>
           </CardContent>
         </Card>
