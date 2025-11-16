@@ -7,16 +7,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Mic, Square, Upload, Download } from 'lucide-react'
 
-interface TranscriptionSegment {
-  start: number
-  end: number
-  text: string
-}
-
 interface TranscriptionResult {
   type: string
   full_text: string
-  segments: TranscriptionSegment[]
   duration: number
   language: string
   language_probability: number
@@ -121,7 +114,6 @@ export default function FullAudioRecorder() {
         setTranscriptionResult({
           type: 'transcription_complete',
           full_text: result.full_text,
-          segments: result.segments,
           duration: result.duration,
           language: result.language,
           language_probability: result.language_probability
