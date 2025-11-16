@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { createPatient, getPatients, processConsultation } from '@/lib/db/queries/queries';
+import { createPatient, getPatients, processConsultation } from '@/lib/db/queries/index';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
@@ -14,6 +14,7 @@ export default function ExampleUsage() {
     setLoading(true);
     try {
       const newPatient = await createPatient({
+        dni: 12345678,
         name: 'Juan Pérez',
         email: 'juan@example.com',
         phone: '+34 600 000 000',
@@ -45,7 +46,7 @@ export default function ExampleUsage() {
     setLoading(true);
     try {
       const result = await processConsultation({
-        patientId: 1, // ID del paciente
+        patientId: 12345678, // ID del paciente
         title: 'Consulta de seguimiento',
         description: 'Revisión de síntomas',
         audioFile: audioFile,
@@ -76,8 +77,9 @@ export default function ExampleUsage() {
           <h2 className="text-xl font-semibold mb-2">Pacientes:</h2>
           <ul className="space-y-2">
             {patients.map((patient) => (
-              <li key={patient.id} className="p-2 bg-gray-100 rounded">
-                {patient.name} - {patient.email}
+              <li key={patient.dni} className="p-3 bg-secondary text-secondary-foreground rounded-lg border">
+                <span className="font-medium">{patient.name}</span>
+                {patient.email && <span className="text-muted-foreground"> - {patient.email}</span>}
               </li>
             ))}
           </ul>
