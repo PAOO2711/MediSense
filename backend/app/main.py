@@ -116,17 +116,10 @@ async def transcribe_uploaded_file(file: UploadFile = File(...)):
         
         # Procesar resultado
         full_transcription = ""
-        segments_list = []
         
         for segment in segments:
             segment_text = segment.text.strip()
             full_transcription += segment_text + " "
-            
-            segments_list.append({
-                "start": round(segment.start, 2),
-                "end": round(segment.end, 2),
-                "text": segment_text
-            })
         
         # Limpiar archivo temporal
         os.unlink(wav_path)
@@ -134,7 +127,6 @@ async def transcribe_uploaded_file(file: UploadFile = File(...)):
         return {
             "success": True,
             "full_text": full_transcription.strip(),
-            "segments": segments_list,
             "duration": round(info.duration, 2),
             "language": info.language,
             "language_probability": round(info.language_probability, 2),
