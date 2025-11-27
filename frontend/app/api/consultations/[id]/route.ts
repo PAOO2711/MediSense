@@ -39,13 +39,16 @@ export async function PUT(
     const { id } = await params;
     const body = await request.json();
     
-    const { title, description, status } = body;
+    const { title, motivoConsulta, anamnesis, pruebas, recomendaciones, status } = body;
 
     const [updated] = await db
       .update(consultations)
       .set({
         title,
-        description,
+        motivoConsulta,
+        anamnesis,
+        pruebas,
+        recomendaciones,
         status,
         updatedAt: new Date(),
       })

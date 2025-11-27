@@ -275,7 +275,9 @@ export default function NuevaConsultaPage({ params }: { params: Promise<{ dni: s
         body: JSON.stringify({
           patientId: patient.dni,
           title: motivoConsulta || 'Consulta médica',
-          description: `Motivo: ${motivoConsulta}\n\nAnamnesis: ${anamnesis}\n\nPruebas complementarias: ${pruebasComplementarias}`,
+          motivoConsulta,
+          anamnesis,
+          pruebas: pruebasComplementarias,
           status: 'completed'
         })
       });
@@ -422,7 +424,7 @@ export default function NuevaConsultaPage({ params }: { params: Promise<{ dni: s
                   placeholder="Ej: Dolor abdominal, revisión rutinaria, seguimiento..."
                   value={motivoConsulta}
                   onChange={(e) => setMotivoConsulta(e.target.value)}
-                  className="text-lg bg-white border border-gray-300"
+                  className="text-lg bg-white border border-gray-300 text-gray-900"
                 />
               </CardContent>
             </Card>
@@ -443,7 +445,7 @@ export default function NuevaConsultaPage({ params }: { params: Promise<{ dni: s
                   placeholder="Describa los síntomas, antecedentes relevantes, evolución del cuadro..."
                   value={anamnesis}
                   onChange={(e) => setAnamnesis(e.target.value)}
-                  className="min-h-[200px] text-base bg-white border border-gray-300"
+                  className="min-h-[200px] text-base bg-white border border-gray-300 text-gray-900"
                 />
               </CardContent>
             </Card>
@@ -464,7 +466,7 @@ export default function NuevaConsultaPage({ params }: { params: Promise<{ dni: s
                   placeholder="Ej: Analítica de sangre completa, Rx tórax, ECG..."
                   value={pruebasComplementarias}
                   onChange={(e) => setPruebasComplementarias(e.target.value)}
-                  className="min-h-[120px] text-base bg-white border border-gray-300"
+                  className="min-h-[120px] text-base bg-white border border-gray-300 text-gray-900"
                 />
               </CardContent>
             </Card>

@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     
-    const { patientId, title, description, status } = body;
+    const { patientId, title, motivoConsulta, anamnesis, pruebas, recomendaciones, status } = body;
 
     if (!patientId || !title) {
       return NextResponse.json(
@@ -39,7 +39,10 @@ export async function POST(request: NextRequest) {
     const consultation = await createConsultation({
       patientId: parseInt(patientId),
       title,
-      description,
+      motivoConsulta,
+      anamnesis,
+      pruebas,
+      recomendaciones,
       status,
     });
 
