@@ -267,7 +267,10 @@ export default function PatientDetailPage({ params }: { params: Promise<{ dni: s
                     </CardDescription>
                   </div>
                 </div>
-                <Button className="bg-teal-600 hover:bg-teal-700 text-white gap-2 shadow-md">
+                <Button 
+                  className="bg-teal-600 hover:bg-teal-700 text-white gap-2 shadow-md"
+                  onClick={() => router.push(`/pacientes/${patient.dni}/nueva-consulta`)}
+                >
                   <Plus className="h-4 w-4" />
                   Nueva consulta
                 </Button>
@@ -285,7 +288,10 @@ export default function PatientDetailPage({ params }: { params: Promise<{ dni: s
                   <p className="text-gray-600 mb-4">
                     Este paciente aún no tiene consultas médicas registradas.
                   </p>
-                  <Button className="bg-teal-600 hover:bg-teal-700 text-white gap-2 shadow-md">
+                  <Button 
+                    className="bg-teal-600 hover:bg-teal-700 text-white gap-2 shadow-md"
+                    onClick={() => router.push(`/pacientes/${patient.dni}/nueva-consulta`)}
+                  >
                     <Plus className="h-4 w-4" />
                     Crear primera consulta
                   </Button>
