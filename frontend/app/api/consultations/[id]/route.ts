@@ -1,0 +1,100 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { getConsultationWithDetails } from '@/lib/db/queries';
+import { db } from '@/lib/db';
+import { consultations } from '@/lib/db/schema';
+import { eq } from 'drizzle-orm';
+
+// GET /api/consultations/[id] - Obtener una consulta con todos sus detalles
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const consultation = await getConsultationWithDetails(id);
+
+    if (!consultation) {
+      return NextResponse.json(
+        { error: 'Consulta no encontrada' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(consultation);
+  } catch (error) {
+    console.error('Error fetching consultation:', error);
+    return NextResponse.json(
+      { error: 'Error al obtener consulta' },
+      { status: 500 }
+    );
+  }
+}
+
+// PUT /api/consultations/[id] - Actualizar una consulta
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const body = await request.json();
+    
+    const { title, description, status } = body;
+
+    const [updated] = await db
+      .update(consultations)
+      .set({
+        title,
+        description,
+        status,
+        updatedAt: new Date(),
+      })
+      .where(eq(consultations.id, id))
+      .returning();
+
+    if (!updated) {
+      return NextResponse.json(
+        { error: 'Consulta no encontrada' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(updated);
+  } catch (error) {
+    console.error('Error updating consultation:', error);
+    return NextResponse.json(
+      { error: 'Error al actualizar consulta' },
+      { status: 500 }
+    );
+  }
+}
+
+// DELETE /api/consultations/[id] - Eliminar una consulta
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    
+    const [deleted] = await db
+      .delete(consultations)
+      .where(eq(consultations.id, id))
+      .returning();
+
+    if (!deleted) {
+      return NextResponse.json(
+        { error: 'Consulta no encontrada' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({ message: 'Consulta eliminada correctamente' });
+  } catch (error) {
+    console.error('Error deleting consultation:', error);
+    return NextResponse.json(
+      { error: 'Error al eliminar consulta' },
+      { status: 500 }
+    );
+  }
+}
