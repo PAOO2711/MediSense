@@ -25,7 +25,8 @@ import {
   AlertCircle,
   User,
   Activity,
-  CheckCheck
+  CheckCheck,
+  ExternalLink
 } from 'lucide-react';
 
 type Patient = {
@@ -313,6 +314,15 @@ export default function NuevaConsultaPage({ params }: { params: Promise<{ dni: s
     
     setSaving(true);
     try {
+      // Prepare antecedentes snapshot
+      const antecedentesSnapshot = patientHistory.map(h => ({
+        id: h.id,
+        antecedente: h.antecedente,
+        status: activeHistoryIds.has(h.id) ? 'activo' : 'resuelto',
+        diagnosticadoEn: h.diagnosticadoEn,
+        consultationId: h.consultationId
+      }));
+
       // Create consultation
       const consultationResponse = await fetch('/api/consultations', {
         method: 'POST',
@@ -324,6 +334,7 @@ export default function NuevaConsultaPage({ params }: { params: Promise<{ dni: s
           anamnesis,
           pruebas: pruebasComplementarias,
           diagnostico,
+          antecedentesSnapshot,
           status: 'completed'
         })
       });
@@ -521,8 +532,20 @@ export default function NuevaConsultaPage({ params }: { params: Promise<{ dni: s
                   <div className="space-y-3">
                     {patientHistory.map((history) => {
                       const isActive = activeHistoryIds.has(history.id);
+                      const toggleHistory = () => {
+                        setActiveHistoryIds(prev => {
+                          const newSet = new Set(prev);
+                          if (newSet.has(history.id)) {
+                            newSet.delete(history.id);
+                          } else {
+                            newSet.add(history.id);
+                          }
+                          return newSet;
+                        });
+                      };
+                      
                       return (
-                        <div 
+                        <div
                           key={history.id}
                           className={`p-4 rounded-lg border-2 transition-all ${
                             isActive 
@@ -533,26 +556,19 @@ export default function NuevaConsultaPage({ params }: { params: Promise<{ dni: s
                           <div className="flex items-start gap-3">
                             <button
                               type="button"
-                              onClick={() => {
-                                setActiveHistoryIds(prev => {
-                                  const newSet = new Set(prev);
-                                  if (newSet.has(history.id)) {
-                                    newSet.delete(history.id);
-                                  } else {
-                                    newSet.add(history.id);
-                                  }
-                                  return newSet;
-                                });
-                              }}
-                              className={`mt-1 flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
+                              onClick={toggleHistory}
+                              className={`mt-1 flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center transition-all hover:shadow-md ${
                                 isActive
-                                  ? 'bg-orange-500 border-orange-500'
+                                  ? 'bg-orange-500 border-orange-500 hover:bg-orange-600'
                                   : 'bg-white border-gray-300 hover:border-orange-400'
                               }`}
                             >
                               {isActive && <CheckCheck className="h-3 w-3 text-white" />}
                             </button>
-                            <div className="flex-1">
+                            <div 
+                              className="flex-1 cursor-pointer"
+                              onClick={toggleHistory}
+                            >
                               <p className={`text-sm font-medium ${isActive ? 'text-gray-900' : 'text-gray-500 line-through'}`}>
                                 {history.antecedente}
                               </p>
@@ -566,6 +582,22 @@ export default function NuevaConsultaPage({ params }: { params: Promise<{ dni: s
                             >
                               {isActive ? 'Activo' : 'Será resuelto'}
                             </Badge>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                window.open(
+                                  `/pacientes/${patient?.dni}/consultas/${history.consultationId}`,
+                                  '_blank',
+                                  'noopener,noreferrer'
+                                );
+                              }}
+                              className="text-orange-600 hover:text-orange-700 hover:bg-orange-100"
+                            >
+                              <ExternalLink className="h-4 w-4" />
+                            </Button>
                           </div>
                         </div>
                       );
