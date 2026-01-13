@@ -30,8 +30,7 @@ class ProductReview(BaseModel):
 
 agent = create_agent(
     model=model,
-    tools=[],
-    response_format=ToolStrategy(ProductReview)
+    response_format=ProductReview
 )
 
 result = agent.invoke({

@@ -23,7 +23,9 @@ import {
   Loader2,
   CheckCircle,
   AlertCircle,
-  User
+  User,
+  Activity,
+  CheckCheck
 } from 'lucide-react';
 
 type Patient = {
@@ -40,6 +42,25 @@ type AISuggestion = {
   confidence: number;
 };
 
+type PatientHistory = {
+  id: string;
+  patientId: number;
+  antecedente: string;
+  status: 'activo' | 'resuelto';
+  diagnosticadoEn: string;
+  consultationId: string;
+  resolvedInConsultationId: string | null;
+  createdAt: string;
+  updatedAt: string | null;
+};
+
+// Helper function to format time in MM:SS
+function formatTime(seconds: number): string {
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+}
+
 export default function NuevaConsultaPage({ params }: { params: Promise<{ dni: string }> }) {
   const resolvedParams = use(params);
   const router = useRouter();
@@ -52,6 +73,11 @@ export default function NuevaConsultaPage({ params }: { params: Promise<{ dni: s
   const [motivoConsulta, setMotivoConsulta] = useState('');
   const [anamnesis, setAnamnesis] = useState('');
   const [pruebasComplementarias, setPruebasComplementarias] = useState('');
+  const [diagnostico, setDiagnostico] = useState('');
+  
+  // Patient history (antecedentes)
+  const [patientHistory, setPatientHistory] = useState<PatientHistory[]>([]);
+  const [activeHistoryIds, setActiveHistoryIds] = useState<Set<string>>(new Set());
   
   // Audio recording
   const [isRecording, setIsRecording] = useState(false);
@@ -71,7 +97,7 @@ export default function NuevaConsultaPage({ params }: { params: Promise<{ dni: s
   // Saving
   const [saving, setSaving] = useState(false);
 
-  // Fetch patient data
+  // Fetch patient data and history
   useEffect(() => {
     async function fetchPatient() {
       try {
@@ -89,7 +115,26 @@ export default function NuevaConsultaPage({ params }: { params: Promise<{ dni: s
         setLoadingPatient(false);
       }
     }
+    
+    async function fetchPatientHistory() {
+      try {
+        const response = await fetch(`/api/patients/${resolvedParams.dni}/history?activeOnly=true`, {
+          method: 'GET',
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          setPatientHistory(data);
+          // Initialize all active antecedents as checked
+          setActiveHistoryIds(new Set(data.map((h: PatientHistory) => h.id)));
+        }
+      } catch (error) {
+        console.error('Error fetching patient history:', error);
+      }
+    }
+    
     fetchPatient();
+    fetchPatientHistory();
   }, [resolvedParams.dni]);
 
   // Audio recording functions
@@ -278,6 +323,7 @@ export default function NuevaConsultaPage({ params }: { params: Promise<{ dni: s
           motivoConsulta,
           anamnesis,
           pruebas: pruebasComplementarias,
+          diagnostico,
           status: 'completed'
         })
       });
@@ -298,6 +344,36 @@ export default function NuevaConsultaPage({ params }: { params: Promise<{ dni: s
             fullText: transcription,
           })
         });
+      }
+      
+      // If there's a diagnosis, create a patient history record
+      if (diagnostico && diagnostico.trim()) {
+        await fetch(`/api/patients/${patient.dni}/history`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            antecedente: diagnostico,
+            diagnosticadoEn: new Date().toISOString(),
+            consultationId: consultation.id,
+            status: 'activo'
+          })
+        });
+      }
+      
+      // Update status of any antecedents that were unchecked (marked as resolved)
+      for (const historyItem of patientHistory) {
+        if (!activeHistoryIds.has(historyItem.id)) {
+          // This antecedent was unchecked, mark it as resolved
+          await fetch(`/api/patients/${patient.dni}/history`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              historyId: historyItem.id,
+              status: 'resuelto',
+              resolvedInConsultationId: consultation.id
+            })
+          });
+        }
       }
 
       // Redirect back to patient detail
@@ -429,6 +505,81 @@ export default function NuevaConsultaPage({ params }: { params: Promise<{ dni: s
               </CardContent>
             </Card>
 
+            {/* Antecedentes */}
+            <Card className="border-0 shadow-lg bg-white">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-gray-800">
+                  <Activity className="h-5 w-5 text-orange-600" />
+                  Antecedentes
+                </CardTitle>
+                <CardDescription>
+                  Historial médico del paciente. Desmarca para marcar como resuelto en esta consulta.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {patientHistory.length > 0 ? (
+                  <div className="space-y-3">
+                    {patientHistory.map((history) => {
+                      const isActive = activeHistoryIds.has(history.id);
+                      return (
+                        <div 
+                          key={history.id}
+                          className={`p-4 rounded-lg border-2 transition-all ${
+                            isActive 
+                              ? 'border-orange-200 bg-orange-50' 
+                              : 'border-gray-200 bg-gray-50 opacity-60'
+                          }`}
+                        >
+                          <div className="flex items-start gap-3">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setActiveHistoryIds(prev => {
+                                  const newSet = new Set(prev);
+                                  if (newSet.has(history.id)) {
+                                    newSet.delete(history.id);
+                                  } else {
+                                    newSet.add(history.id);
+                                  }
+                                  return newSet;
+                                });
+                              }}
+                              className={`mt-1 flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
+                                isActive
+                                  ? 'bg-orange-500 border-orange-500'
+                                  : 'bg-white border-gray-300 hover:border-orange-400'
+                              }`}
+                            >
+                              {isActive && <CheckCheck className="h-3 w-3 text-white" />}
+                            </button>
+                            <div className="flex-1">
+                              <p className={`text-sm font-medium ${isActive ? 'text-gray-900' : 'text-gray-500 line-through'}`}>
+                                {history.antecedente}
+                              </p>
+                              <p className="text-xs text-gray-500 mt-1">
+                                Diagnosticado: {new Date(history.diagnosticadoEn).toLocaleDateString('es-ES')}
+                              </p>
+                            </div>
+                            <Badge 
+                              variant="outline" 
+                              className={isActive ? 'bg-green-100 text-green-700 border-green-200' : 'bg-gray-100 text-gray-600 border-gray-200'}
+                            >
+                              {isActive ? 'Activo' : 'Será resuelto'}
+                            </Badge>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="text-center py-6 text-gray-500">
+                    <FileText className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                    <p className="text-sm">No hay antecedentes registrados</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
             {/* Anamnesis */}
             <Card className="border-0 shadow-lg bg-white">
               <CardHeader>
@@ -467,6 +618,27 @@ export default function NuevaConsultaPage({ params }: { params: Promise<{ dni: s
                   value={pruebasComplementarias}
                   onChange={(e) => setPruebasComplementarias(e.target.value)}
                   className="min-h-[120px] text-base bg-white border border-gray-300 text-gray-900"
+                />
+              </CardContent>
+            </Card>
+
+            {/* Diagnóstico */}
+            <Card className="border-0 shadow-lg bg-white">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-gray-800">
+                  <Brain className="h-5 w-5 text-indigo-600" />
+                  Diagnóstico
+                </CardTitle>
+                <CardDescription>
+                  Diagnóstico final de la consulta. Se añadirá al historial del paciente.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Textarea
+                  placeholder="Ej: Gastroenteritis aguda, Hipertensión arterial descompensada..."
+                  value={diagnostico}
+                  onChange={(e) => setDiagnostico(e.target.value)}
+                  className="min-h-[100px] text-base bg-white border border-gray-300 text-gray-900"
                 />
               </CardContent>
             </Card>

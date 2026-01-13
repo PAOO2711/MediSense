@@ -1,0 +1,117 @@
+import { NextRequest, NextResponse } from "next/server";
+import {
+  getPatientHistoryByDNI,
+  createPatientHistory,
+  updatePatientHistoryStatus,
+} from "@/lib/db/queries/queries";
+
+// GET /api/patients/[dni]/history
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ dni: string }> }
+) {
+  try {
+    const { dni } = await params;
+    const patientDNI = parseInt(dni);
+
+    if (isNaN(patientDNI)) {
+      return NextResponse.json(
+        { error: "DNI inválido" },
+        { status: 400 }
+      );
+    }
+
+    // Check query param for activeOnly filter
+    const url = new URL(request.url);
+    const activeOnly = url.searchParams.get("activeOnly") === "true";
+
+    const history = await getPatientHistoryByDNI(patientDNI, activeOnly);
+    return NextResponse.json(history);
+  } catch (error) {
+    console.error("Error fetching patient history:", error);
+    return NextResponse.json(
+      { error: "Error al obtener el historial del paciente" },
+      { status: 500 }
+    );
+  }
+}
+
+// POST /api/patients/[dni]/history
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ dni: string }> }
+) {
+  try {
+    const { dni } = await params;
+    const patientDNI = parseInt(dni);
+
+    if (isNaN(patientDNI)) {
+      return NextResponse.json(
+        { error: "DNI inválido" },
+        { status: 400 }
+      );
+    }
+
+    const body = await request.json();
+    const { antecedente, diagnosticadoEn, consultationId, status } = body;
+
+    if (!antecedente || !diagnosticadoEn || !consultationId) {
+      return NextResponse.json(
+        { error: "Faltan campos requeridos: antecedente, diagnosticadoEn, consultationId" },
+        { status: 400 }
+      );
+    }
+
+    const history = await createPatientHistory({
+      patientId: patientDNI,
+      antecedente,
+      diagnosticadoEn: new Date(diagnosticadoEn),
+      consultationId,
+      status: status || 'activo',
+    });
+
+    return NextResponse.json(history, { status: 201 });
+  } catch (error) {
+    console.error("Error creating patient history:", error);
+    return NextResponse.json(
+      { error: "Error al crear el antecedente" },
+      { status: 500 }
+    );
+  }
+}
+
+// PUT /api/patients/[dni]/history
+export async function PUT(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { historyId, status, resolvedInConsultationId } = body;
+
+    if (!historyId || !status) {
+      return NextResponse.json(
+        { error: "Faltan campos requeridos: historyId, status" },
+        { status: 400 }
+      );
+    }
+
+    if (status !== 'activo' && status !== 'resuelto') {
+      return NextResponse.json(
+        { error: "Status debe ser 'activo' o 'resuelto'" },
+        { status: 400 }
+      );
+    }
+
+    const updated = await updatePatientHistoryStatus(
+      historyId,
+      status,
+      resolvedInConsultationId
+    );
+
+    return NextResponse.json(updated);
+  } catch (error) {
+    console.error("Error updating patient history status:", error);
+    return NextResponse.json(
+      { error: "Error al actualizar el estado del antecedente" },
+      { status: 500 }
+    );
+  }
+}
