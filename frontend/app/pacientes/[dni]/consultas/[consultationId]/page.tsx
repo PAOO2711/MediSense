@@ -36,7 +36,6 @@ type Consultation = {
   pruebas: string | null;
   diagnostico: string | null;
   recomendaciones: string | null;
-  antecedentesSnapshot: any;
   date: string;
   status: string;
   createdAt: string;
@@ -236,73 +235,13 @@ export default function ConsultaDetailPage({
               </CardContent>
             </Card>
 
-            {/* Antecedentes activos en el momento de la consulta */}
-            {consultation.antecedentesSnapshot && consultation.antecedentesSnapshot.length > 0 && (
-              <Card className="border-0 shadow-lg bg-white">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-gray-800">
-                    <Activity className="h-5 w-5 text-blue-600" />
-                    Antecedentes del Paciente
-                  </CardTitle>
-                  <CardDescription>
-                    Antecedentes registrados en el momento de esta consulta
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {consultation.antecedentesSnapshot.map((antecedent: any) => (
-                      <div
-                        key={antecedent.id}
-                        className={`p-4 rounded-lg border-2 ${
-                          antecedent.status === 'activo'
-                            ? 'border-blue-200 bg-blue-50'
-                            : 'border-gray-200 bg-gray-50'
-                        }`}
-                      >
-                        <div className="flex items-start gap-3">
-                          <div className="flex-1">
-                            <p className={`text-sm font-medium ${
-                              antecedent.status === 'activo' ? 'text-gray-900' : 'text-gray-500 line-through'
-                            }`}>
-                              {antecedent.antecedente}
-                            </p>
-                            <p className="text-xs text-gray-500 mt-1">
-                              Diagnosticado: {new Date(antecedent.diagnosticadoEn).toLocaleDateString('es-ES')}
-                            </p>
-                          </div>
-                          <Badge 
-                            variant="outline" 
-                            className={
-                              antecedent.status === 'activo'
-                                ? 'bg-green-100 text-green-700 border-green-200'
-                                : 'bg-gray-100 text-gray-600 border-gray-200'
-                            }
-                          >
-                            {antecedent.status === 'activo' ? 'Activo' : 'Resuelto'}
-                          </Badge>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => navigateToConsultation(antecedent.consultationId)}
-                            className="text-blue-600 hover:text-blue-700 hover:bg-blue-100"
-                          >
-                            <ExternalLink className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
             {/* Antecedentes diagnosticados en esta consulta */}
             {relatedAntecedents.length > 0 && (
               <Card className="border-0 shadow-lg bg-white">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-gray-800">
                     <Activity className="h-5 w-5 text-orange-600" />
-                    Nuevos Diagnósticos
+                    Antecedentes Diagnosticados
                   </CardTitle>
                   <CardDescription>
                     Condiciones diagnosticadas en esta consulta

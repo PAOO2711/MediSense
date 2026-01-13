@@ -1,0 +1,1 @@
+ALTER TABLE "consultations" ADD COLUMN "antecedentes_snapshot" jsonb;

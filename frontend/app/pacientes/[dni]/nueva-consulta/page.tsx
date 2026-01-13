@@ -314,15 +314,6 @@ export default function NuevaConsultaPage({ params }: { params: Promise<{ dni: s
     
     setSaving(true);
     try {
-      // Prepare antecedentes snapshot
-      const antecedentesSnapshot = patientHistory.map(h => ({
-        id: h.id,
-        antecedente: h.antecedente,
-        status: activeHistoryIds.has(h.id) ? 'activo' : 'resuelto',
-        diagnosticadoEn: h.diagnosticadoEn,
-        consultationId: h.consultationId
-      }));
-
       // Create consultation
       const consultationResponse = await fetch('/api/consultations', {
         method: 'POST',
@@ -334,7 +325,6 @@ export default function NuevaConsultaPage({ params }: { params: Promise<{ dni: s
           anamnesis,
           pruebas: pruebasComplementarias,
           diagnostico,
-          antecedentesSnapshot,
           status: 'completed'
         })
       });

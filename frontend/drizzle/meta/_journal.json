@@ -15,6 +15,13 @@
       "when": 1768308114513,
       "tag": "0001_breezy_red_shift",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1768312599976,
+      "tag": "0002_flaky_bulldozer",
+      "breakpoints": true
     }
   ]
 }
