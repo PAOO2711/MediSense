@@ -7,8 +7,8 @@ from langchain_core.output_parsers import PydanticOutputParser
 import logging
 from typing import Optional
 
-from ..config.settings import settings
-from ..models.schemas import MedicalAnalysis
+from app.config.settings import settings
+from app.models.schemas import MedicalAnalysis
 
 logger = logging.getLogger(__name__)
 

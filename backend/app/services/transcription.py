@@ -7,8 +7,8 @@ import tempfile
 from pathlib import Path
 from typing import Dict
 
-from ..config.settings import settings
-from ..utils.audio import convert_webm_to_wav, cleanup_temp_file
+from app.config.settings import settings
+from app.utils.audio import convert_webm_to_wav, cleanup_temp_file
 
 logger = logging.getLogger(__name__)
 

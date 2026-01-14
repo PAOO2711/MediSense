@@ -5,11 +5,17 @@ Sistema de transcripción y análisis médico con IA
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import logging
+import sys
+from pathlib import Path
 
-from config.settings import settings
-from models.schemas import TranscriptionResponse, MedicalAnalysis, AnalysisRequest
-from services.transcription import transcription_service
-from services.ai_analysis import medical_analysis_service
+# Agregar el directorio backend al path
+backend_dir = Path(__file__).parent.parent
+sys.path.insert(0, str(backend_dir))
+
+from app.config.settings import settings
+from app.models.schemas import TranscriptionResponse, MedicalAnalysis, AnalysisRequest
+from app.services.transcription import transcription_service
+from app.services.ai_analysis import medical_analysis_service
 
 # Configurar logging
 logging.basicConfig(
@@ -161,4 +167,4 @@ async def health_check():
 if __name__ == "__main__":
     import uvicorn
     logger.info("🚀 Iniciando MediSense API...")
-    uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("app.main_refactored:app", host="0.0.0.0", port=8000, reload=True)
