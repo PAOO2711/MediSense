@@ -29,12 +29,7 @@ import {
   Stethoscope,
   Activity
 } from 'lucide-react';
-
-type Patient = {
-  dni: number;
-  name: string;
-  email: string | null;
-};
+import type { Patient } from '@/types/consultation';
 
 type SortBy = 'name' | 'dni' | 'createdAt';
 type SortOrder = 'asc' | 'desc';

@@ -5,6 +5,12 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
 import { 
   ArrowLeft, 
   Calendar,
@@ -19,44 +25,7 @@ import {
   Activity,
   ExternalLink
 } from 'lucide-react';
-
-type Patient = {
-  dni: number;
-  name: string;
-  email: string | null;
-  phone: string | null;
-};
-
-type Consultation = {
-  id: string;
-  patientId: number;
-  title: string;
-  motivoConsulta: string | null;
-  anamnesis: string | null;
-  pruebas: string | null;
-  diagnostico: string | null;
-  recomendaciones: string | null;
-  date: string;
-  status: string;
-  createdAt: string;
-};
-
-type Transcription = {
-  id: string;
-  consultationId: string;
-  fullText: string;
-  createdAt: string;
-};
-
-type PatientHistory = {
-  id: string;
-  patientId: number;
-  antecedente: string;
-  status: 'activo' | 'resuelto';
-  diagnosticadoEn: string;
-  consultationId: string;
-  resolvedInConsultationId: string | null;
-};
+import type { Patient, Consultation, Transcription, PatientHistory } from '@/types/consultation';
 
 export default function ConsultaDetailPage({ 
   params 
@@ -374,8 +343,9 @@ export default function ConsultaDetailPage({
             </Card>
           </div>
 
-          {/* Right Column - Transcription */}
-          <div className="lg:col-span-1">
+          {/* Right Column - Transcription and Resumen */}
+          <div className="lg:col-span-1 space-y-6">
+            {/* Transcription Card */}
             <Card className="border-0 shadow-lg bg-white sticky top-6">
               <CardHeader className="bg-gradient-to-r from-teal-500 to-teal-600 text-white -mt-6 pt-8 pb-4">
                 <CardTitle className="flex items-center gap-2">
@@ -388,22 +358,31 @@ export default function ConsultaDetailPage({
               </CardHeader>
               <CardContent className="pt-6">
                 {transcription ? (
-                  <div className="bg-gray-50 p-4 rounded-lg border max-h-[600px] overflow-y-auto">
-                    <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
-                      {transcription.fullText}
-                    </p>
-                    <div className="mt-4 pt-4 border-t border-gray-200">
-                      <p className="text-xs text-gray-500">
-                        Transcrito el {new Date(transcription.createdAt).toLocaleDateString('es-ES', {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })}
-                      </p>
-                    </div>
-                  </div>
+                  <Accordion type="single" collapsible className="w-full">
+                    <AccordionItem value="transcription" className="border-none">
+                      <AccordionTrigger className="text-sm font-medium text-gray-700 hover:text-gray-900 hover:no-underline">
+                        Ver transcripción completa
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        <div className="bg-gray-50 p-4 rounded-lg border max-h-[600px] overflow-y-auto">
+                          <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+                            {transcription.fullText}
+                          </p>
+                          <div className="mt-4 pt-4 border-t border-gray-200">
+                            <p className="text-xs text-gray-500">
+                              Transcrito el {new Date(transcription.createdAt).toLocaleDateString('es-ES', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}
+                            </p>
+                          </div>
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
                 ) : (
                   <div className="text-center py-8 text-gray-500">
                     <FileText className="h-8 w-8 mx-auto mb-2 opacity-50" />
@@ -412,6 +391,44 @@ export default function ConsultaDetailPage({
                 )}
               </CardContent>
             </Card>
+
+            {/* Resumen IA Card */}
+            {relatedAntecedents.some(ant => ant.resumen) && (
+              <Card className="border-0 shadow-lg bg-white">
+                <CardHeader className="bg-gradient-to-r from-purple-500 to-purple-600 text-white -mt-6 pt-8 pb-4">
+                  <CardTitle className="flex items-center gap-2">
+                    <Brain className="h-5 w-5" />
+                    Resumen IA
+                  </CardTitle>
+                  <CardDescription className="text-purple-100">
+                    Análisis generado por inteligencia artificial
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="pt-6">
+                  {relatedAntecedents.filter(ant => ant.resumen).map((antecedent) => (
+                    <Accordion key={antecedent.id} type="single" collapsible className="w-full">
+                      <AccordionItem value={`resumen-${antecedent.id}`} className="border-none">
+                        <AccordionTrigger className="text-sm font-medium text-gray-700 hover:text-gray-900 hover:no-underline">
+                          Ver resumen de análisis
+                        </AccordionTrigger>
+                        <AccordionContent>
+                          <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                            <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+                              {antecedent.resumen}
+                            </p>
+                            <div className="mt-4 pt-4 border-t border-purple-200">
+                              <p className="text-xs text-gray-500">
+                                Asociado al diagnóstico: <span className="font-medium">{antecedent.antecedente}</span>
+                              </p>
+                            </div>
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    </Accordion>
+                  ))}
+                </CardContent>
+              </Card>
+            )}
           </div>
         </div>
       </div>

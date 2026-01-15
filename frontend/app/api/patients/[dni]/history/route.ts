@@ -53,7 +53,7 @@ export async function POST(
     }
 
     const body = await request.json();
-    const { antecedente, diagnosticadoEn, consultationId, status } = body;
+    const { antecedente, resumen, diagnosticadoEn, consultationId, status } = body;
 
     if (!antecedente || !diagnosticadoEn || !consultationId) {
       return NextResponse.json(
@@ -65,6 +65,7 @@ export async function POST(
     const history = await createPatientHistory({
       patientId: patientDNI,
       antecedente,
+      resumen: resumen || null,
       diagnosticadoEn: new Date(diagnosticadoEn),
       consultationId,
       status: status || 'activo',

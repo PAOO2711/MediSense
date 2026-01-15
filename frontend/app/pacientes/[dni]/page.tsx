@@ -20,27 +20,7 @@ import {
   Activity,
   Heart
 } from 'lucide-react';
-
-type Patient = {
-  dni: number;
-  name: string;
-  email: string | null;
-  phone: string | null;
-  dateOfBirth: Date | null;
-  createdAt: Date;
-  updatedAt: Date;
-};
-
-type Consultation = {
-  id: string;
-  patientId: number | null;
-  title: string;
-  description: string | null;
-  date: Date;
-  status: string | null;
-  createdAt: Date;
-  updatedAt: Date;
-};
+import type { Patient, Consultation } from '@/types/consultation';
 
 export default function PatientDetailPage({ params }: { params: Promise<{ dni: string }> }) {
   const resolvedParams = use(params);
@@ -87,7 +67,7 @@ export default function PatientDetailPage({ params }: { params: Promise<{ dni: s
     fetchData();
   }, [resolvedParams.dni, hasFetched]);
 
-  const formatDate = (date: Date | null) => {
+  const formatDate = (date: Date | string | null | undefined) => {
     if (!date) return 'No especificada';
     return new Date(date).toLocaleDateString('es-ES', {
       day: '2-digit',

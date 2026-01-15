@@ -28,32 +28,7 @@ import {
   CheckCheck,
   ExternalLink
 } from 'lucide-react';
-
-type Patient = {
-  dni: number;
-  name: string;
-  email: string | null;
-  phone: string | null;
-};
-
-type AISuggestion = {
-  id: string;
-  type: 'symptom' | 'condition' | 'recommendation';
-  text: string;
-  confidence: number;
-};
-
-type PatientHistory = {
-  id: string;
-  patientId: number;
-  antecedente: string;
-  status: 'activo' | 'resuelto';
-  diagnosticadoEn: string;
-  consultationId: string;
-  resolvedInConsultationId: string | null;
-  createdAt: string;
-  updatedAt: string | null;
-};
+import type { Patient, AISuggestion, PatientHistory } from '@/types/consultation';
 
 // Helper function to format time in MM:SS
 function formatTime(seconds: number): string {
@@ -94,6 +69,7 @@ export default function NuevaConsultaPage({ params }: { params: Promise<{ dni: s
   // AI Suggestions
   const [aiSuggestions, setAiSuggestions] = useState<AISuggestion[]>([]);
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
+  const [aiAnalysisResumen, setAiAnalysisResumen] = useState<string>('');
   
   // Saving
   const [saving, setSaving] = useState(false);
@@ -206,21 +182,44 @@ export default function NuevaConsultaPage({ params }: { params: Promise<{ dni: s
       const formData = new FormData();
       formData.append('file', audioBlob, 'recording.webm');
 
-      const response = await fetch('http://localhost:8000/transcribe_file', {
+      const response = await fetch('http://localhost:8000/transcribe_and_analyze', {
         method: 'POST',
         body: formData
       });
 
+      if (!response.ok) {
+        throw new Error(`Error del servidor: ${response.status}`);
+      }
+
       const result = await response.json();
 
-      if (result.success) {
-        setTranscription(result.full_text);
+      // Extraer transcripción
+      if (result.transcription?.success) {
+        setTranscription(result.transcription.full_text);
         setRecordingStatus('Transcripción completada');
-        
-        // Trigger AI suggestions based on transcription
-        generateAISuggestions(result.full_text);
       } else {
-        setRecordingStatus(`Error: ${result.error}`);
+        setRecordingStatus('Error en transcripción');
+        return;
+      }
+
+      // Extraer y mapear sugerencias de IA
+      if (result.analysis) {
+        setLoadingSuggestions(true);
+        
+        // Guardar el resumen para usarlo al guardar la consulta
+        if (result.analysis.resumen) {
+          setAiAnalysisResumen(result.analysis.resumen);
+        }
+        
+        const aiSuggestions: AISuggestion[] = result.analysis.sugerencias.map((sug: any, index: number) => ({
+          id: `ai-${Date.now()}-${index}`,
+          type: sug.tipo as 'symptom' | 'condition' | 'recommendation',
+          text: sug.contenido,
+          confidence: sug.confianza
+        }));
+        
+        setAiSuggestions(aiSuggestions);
+        setLoadingSuggestions(false);
       }
 
     } catch (error) {
@@ -237,65 +236,12 @@ export default function NuevaConsultaPage({ params }: { params: Promise<{ dni: s
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // AI Suggestions (mock for now - will be replaced with real AI later)
+  // Note: AI suggestions are now generated directly in transcribeAudio via backend
+  // This function is no longer needed but kept for reference if manual triggering is needed
   const generateAISuggestions = async (text: string) => {
-    setLoadingSuggestions(true);
-    
-    // TODO: Replace with real AI endpoint call
-    // For now, simulate AI processing
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    // Mock suggestions based on keywords in transcription
-    const mockSuggestions: AISuggestion[] = [];
-    
-    if (text.toLowerCase().includes('dolor') || text.toLowerCase().includes('duele')) {
-      mockSuggestions.push({
-        id: '1',
-        type: 'symptom',
-        text: 'Dolor localizado - evaluar intensidad en escala EVA',
-        confidence: 0.85
-      });
-    }
-    
-    if (text.toLowerCase().includes('fiebre') || text.toLowerCase().includes('temperatura')) {
-      mockSuggestions.push({
-        id: '2',
-        type: 'symptom',
-        text: 'Síndrome febril - considerar origen infeccioso',
-        confidence: 0.90
-      });
-    }
-    
-    if (text.toLowerCase().includes('tos') || text.toLowerCase().includes('respirar')) {
-      mockSuggestions.push({
-        id: '3',
-        type: 'condition',
-        text: 'Síntomas respiratorios - auscultación pulmonar recomendada',
-        confidence: 0.78
-      });
-    }
-    
-    if (text.toLowerCase().includes('cabeza') || text.toLowerCase().includes('cefalea')) {
-      mockSuggestions.push({
-        id: '4',
-        type: 'condition',
-        text: 'Cefalea - descartar signos de alarma neurológicos',
-        confidence: 0.82
-      });
-    }
-
-    // Always add a general suggestion if transcription exists
-    if (text.length > 10 && mockSuggestions.length === 0) {
-      mockSuggestions.push({
-        id: '5',
-        type: 'recommendation',
-        text: 'Realizar exploración física completa',
-        confidence: 0.70
-      });
-    }
-    
-    setAiSuggestions(mockSuggestions);
-    setLoadingSuggestions(false);
+    // This is now handled automatically by the backend in transcribe_and_analyze
+    // Keeping this function in case we need to re-analyze later
+    console.log('AI suggestions are now generated automatically during transcription');
   };
 
   const addSuggestionToAnamnesis = (suggestion: AISuggestion) => {
@@ -354,6 +300,7 @@ export default function NuevaConsultaPage({ params }: { params: Promise<{ dni: s
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             antecedente: diagnostico,
+            resumen: aiAnalysisResumen || null, // Guardar el resumen del análisis de IA
             diagnosticadoEn: new Date().toISOString(),
             consultationId: consultation.id,
             status: 'activo'
