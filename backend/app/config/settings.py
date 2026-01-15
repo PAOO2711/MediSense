@@ -10,10 +10,15 @@ load_dotenv()
 class Settings:
     # API Keys
     GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+    GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
     
     # Modelo Groq
     GROQ_MODEL = "llama-3.3-70b-versatile"
     GROQ_TEMPERATURE = 0.3  # Más bajo para diagnósticos médicos
+
+    # Modelo Gemini
+    GEMINI_MODEL = "gemini-2.5-flash"
+    GEMINI_TEMPERATURE = 0.3  # Más bajo para diagnósticos médicos
     
     # Modelo Whisper
     WHISPER_MODEL = "small"
