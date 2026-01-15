@@ -38,30 +38,42 @@ class MedicalAnalysisService:
             
             # Crear el prompt template
             system_prompt = """Eres un asistente médico experto que analiza transcripciones de consultas médicas.
-Tu objetivo es ayudar al médico identificando síntomas, sugiriendo posibles diagnósticos y recomendando preguntas adicionales.
+            Tu objetivo es ayudar al médico identificando síntomas y sugiriendo posibles diagnósticos.
 
-IMPORTANTE:
-- Sé preciso y objetivo
-- No hagas diagnósticos definitivos, solo sugerencias
-- Identifica todos los síntomas mencionados
-- Sugiere exámenes relevantes si es necesario
-- Considera el contexto cultural y lingüístico (español)
-- Prioriza la seguridad del paciente
+            IMPORTANTE:
+            - Sé preciso y objetivo
+            - No hagas diagnósticos definitivos, solo sugerencias
+            - Identifica todos los síntomas mencionados por el paciente
+            - Considera el contexto cultural y lingüístico (español)
+            - Prioriza la seguridad del paciente
 
-{format_instructions}"""
+            TIPOS DE SUGERENCIAS:
+            - "symptom": Síntomas adicionales que el médico debería investigar o confirmar
+            - "condition": Posibles condiciones médicas o diagnósticos diferenciales a considerar
+            - "recommendation": Exámenes, pruebas, o acciones recomendadas (análisis, referencias, seguimiento)
+
+            Asigna un nivel de confianza (0.0 a 1.0) a cada sugerencia basado en:
+            - 0.7-1.0: Alta confianza (síntomas/condiciones claramente mencionados o típicos)
+            - 0.4-0.6: Confianza media (posibilidad razonable, requiere más información)
+            - 0.0-0.3: Baja confianza (considerar pero poco probable)
+
+            {format_instructions}"""
             
             user_prompt = """Analiza la siguiente transcripción de una consulta médica:
 
-TRANSCRIPCIÓN:
-{transcription}
+            TRANSCRIPCIÓN:
+            {transcription}
 
-{context_section}
+            {context_section}
 
-Proporciona un análisis estructurado que ayude al médico a:
-1. Identificar síntomas clave
-2. Considerar posibles diagnósticos
-3. Sugerir exámenes o preguntas adicionales
-4. Evaluar el nivel de urgencia"""
+            Proporciona un análisis estructurado que ayude al médico a:
+            1. Generar un resumen breve e informativo de la consulta
+            2. Identificar todos los síntomas mencionados por el paciente
+            3. Sugerir síntomas adicionales a investigar (tipo: "symptom")
+            4. Sugerir posibles condiciones médicas a considerar (tipo: "condition")
+            5. Recomendar exámenes, pruebas o acciones (tipo: "recommendation")
+
+            Sé claro, conciso y profesional. Proporciona justificaciones sólidas para cada sugerencia."""
 
             self.prompt = ChatPromptTemplate.from_messages([
                 ("system", system_prompt),
