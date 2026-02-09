@@ -9,8 +9,13 @@ from typing import Optional
 
 from app.config.settings import settings
 from app.models.schemas import MedicalAnalysis
+from embeddings import EmbeddingsService
 
 logger = logging.getLogger(__name__)
+
+""" document = Document(
+    page_content="Hello, world!", metadata={"source": "https://example.com"}
+) """
 
 class MedicalAnalysisService:
     """Servicio para analizar transcripciones médicas con IA"""
@@ -19,6 +24,7 @@ class MedicalAnalysisService:
         self.llm = None
         self.parser = None
         self.chain = None
+        self.embeddings_service = EmbeddingsService()
         self._initialize()
     
     def _initialize(self):
