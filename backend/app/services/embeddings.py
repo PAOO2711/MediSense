@@ -23,6 +23,8 @@ class EmbeddingsService:
 
     def create_embeddings(self, doc: Document):
 
+        
+        
         self.vector_store = SupabaseVectorStore.from_documents(
             [doc],  # from_documents espera una lista
             self.embeddings,
@@ -32,17 +34,37 @@ class EmbeddingsService:
         )
 
     def retrieve_similar_cases(self, query: str, top_k: int = 5, patient_id: int = None) -> list[dict]:
-        self.vector_store = SupabaseVectorStore(
-            embedding=self.embeddings,
-            client=self.supabase,
-            table_name="documents",
-            query_name="match_documents",
-        )
-        
-        if not self.vector_store:
-            raise ValueError("Vector store no inicializado. Crea embeddings primero.")
-        
-        results = self.vector_store.similarity_search(query, k=top_k, patient_id=patient_id)
-        return [ {"content": doc.page_content, "metadata": doc.metadata} for doc in results ]
+        try:
+            # Generar embedding de la consulta
+            query_embedding = self.embeddings.embed_query(query)
+            
+            # Parámetros para la función RPC
+            rpc_params = {
+                "query_embedding": query_embedding,
+                "match_count": top_k,
+            }
+            
+            # Agregar patient_id solo si se proporciona
+            if patient_id is not None:
+                rpc_params["patient_id"] = patient_id
+            
+            # Llamar a la función RPC de Supabase
+            res = self.supabase.rpc("match_documents", rpc_params).execute()
+            
+            # Formatear resultados
+            results = [
+                {
+                    "content": row["content"],
+                    "metadata": row["metadata"],
+                    "similarity": row.get("similarity", 0),
+                }
+                for row in res.data
+            ]
+            
+            return results
+            
+        except Exception as e:
+            # Si hay error (ej. tabla vacía o función no existe), retornar lista vacía
+            return []
 
 

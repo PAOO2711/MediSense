@@ -131,8 +131,19 @@ class MedicalAnalysisService:
                 """
 
             patient_context = self.embeddings_service.retrieve_similar_cases(query=query, top_k=5, patient_id=patient_id)
+
+            logger.info(f"📚 Contexto recuperado: {len(patient_context)} casos similares encontrados para el paciente_id={patient_id}")
+            logger.info(f"CONTEXTO RECUPERADO: {patient_context}")
             
-            context_section = f"\nCONTEXTO DEL PACIENTE:\n{patient_context}\n"
+            # Formatear contexto del paciente de forma legible
+            if patient_context and len(patient_context) > 0:
+                formatted_context = "\n\n".join([
+                    f"Consulta previa:\n{case['content']}" 
+                    for case in patient_context
+                ])
+                context_section = f"\nCONTEXTO DEL PACIENTE (Consultas previas relevantes):\n{formatted_context}\n"
+            else:
+                context_section = "\nCONTEXTO DEL PACIENTE:\nPrimera consulta registrada. No hay historial previo disponible.\n"
             
             # Ejecutar el análisis
             result = self.chain.invoke({

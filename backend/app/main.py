@@ -2,7 +2,7 @@
 API principal de MediSense - Versión refactorizada
 Sistema de transcripción y análisis médico con IA
 """
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import FastAPI, UploadFile, File, HTTPException, Form, Body
 from fastapi.middleware.cors import CORSMiddleware
 import logging
 import sys
@@ -116,7 +116,7 @@ async def analyze_transcription(request: AnalysisRequest):
 @app.post("/transcribe_and_analyze")
 async def transcribe_and_analyze(
     file: UploadFile = File(...),
-    patient_id: int = None
+    patient_id: int = Form(None)
     #patient_context: str = None
 ):
     """
@@ -158,18 +158,19 @@ async def transcribe_and_analyze(
 
 @app.post("/generate_embeddings")
 async def generate_embeddings(
-    page_content: str,
-    metadata: dict,
+    page_content: str = Body(...),
+    metadata: dict = Body(...),
 ):
     """
     Genera embeddings para un documento y los almacena en Supabase
     
     Args:
         page_content: Contenido del documento
-        metadata: Metadatos asociados al documento
+        metadata: Metadatos asociados al documento (debe incluir patient_id)
     """
     try:
         medical_analysis_service.generate_embeddings(page_content, metadata)
+        return {"success": True, "message": "Embeddings generados correctamente"}
     except Exception as e:
         logger.error(f"Error generando embeddings: {e}")
         raise HTTPException(status_code=500, detail=str(e))
