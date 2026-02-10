@@ -9,7 +9,7 @@ from typing import Optional
 
 from app.config.settings import settings
 from app.models.schemas import MedicalAnalysis
-from embeddings import EmbeddingsService
+from app.services.embeddings import EmbeddingsService
 
 logger = logging.getLogger(__name__)
 
@@ -97,15 +97,16 @@ class MedicalAnalysisService:
     
     def analyze_transcription(
         self, 
-        transcription: str, 
-        patient_context: Optional[str] = None
+        transcription: str,
+        patient_id: int 
+        #patient_context: Optional[str] = None
     ) -> MedicalAnalysis:
         """
         Analiza una transcripción médica y genera sugerencias
         
         Args:
             transcription: Texto transcrito de la consulta
-            patient_context: Contexto adicional del paciente (historial, edad, etc.)
+            patient_id: ID del paciente para contexto adicional
             
         Returns:
             MedicalAnalysis: Análisis estructurado de la consulta
@@ -118,8 +119,19 @@ class MedicalAnalysisService:
             
             # Preparar el contexto
             context_section = ""
-            if patient_context:
-                context_section = f"\nCONTEXTO DEL PACIENTE:\n{patient_context}\n"
+
+            query = """
+                Extrae información que pueda ser relevante para entender mejor el caso del paciente y relacionarlo con la consulta actual.
+                Información a destacar podrían ser:
+                - Alergias del paciente
+                - Enfermedades crónicas o condiciones médicas relevantes
+                - Antecedentes destacados que puedan aportar contexto (ej. cirugías, cancer, ictus, secuelas de alguna enfermedad, etc.)
+                - Medicamentos que el paciente esté tomando actualmente o haya tomado recientemente
+                """
+
+            patient_context = self.embeddings_service.retrieve_similar_cases(query=query, top_k=5, patient_id=patient_id)
+            
+            context_section = f"\nCONTEXTO DEL PACIENTE:\n{patient_context}\n"
             
             # Ejecutar el análisis
             result = self.chain.invoke({

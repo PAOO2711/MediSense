@@ -1,12 +1,14 @@
 from dotenv import load_dotenv
 import os
+from pathlib import Path
 
 # Cargar las variables de entorno desde el archivo .env
-load_dotenv()
+env_path = Path(__file__).parent.parent.parent / ".env"
+load_dotenv(dotenv_path=env_path)
 
 from langchain_community.vectorstores import SupabaseVectorStore
 from supabase.client import Client, create_client
-from langchain.schema import Document
+from langchain_core.documents import Document
 from langchain_huggingface.embeddings import HuggingFaceEmbeddings
 
 supabase_url = os.getenv("SUPABASE_URL")

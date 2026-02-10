@@ -181,6 +181,7 @@ export default function NuevaConsultaPage({ params }: { params: Promise<{ dni: s
     try {
       const formData = new FormData();
       formData.append('file', audioBlob, 'recording.webm');
+      formData.append('patient_id', resolvedParams.dni); // Pasar el DNI del paciente para contexto adicional
 
       const response = await fetch('http://localhost:8000/transcribe_and_analyze', {
         method: 'POST',

@@ -29,4 +29,4 @@ class MedicalAnalysis(BaseModel):
 
 class AnalysisRequest(BaseModel):
     transcription: str = Field(description="Texto transcrito de la consulta")
-    patient_context: Optional[str] = Field(default=None, description="Contexto adicional del paciente que incluye los antecedentes médicos activos")
+    patient_id: int = Field(description="ID del paciente para contexto adicional")

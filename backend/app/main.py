@@ -102,7 +102,7 @@ async def analyze_transcription(request: AnalysisRequest):
         # Analizar
         analysis = medical_analysis_service.analyze_transcription(
             transcription=request.transcription,
-            patient_context=request.patient_context
+            patient_id=request.patient_id
         )
         
         return analysis
@@ -116,7 +116,8 @@ async def analyze_transcription(request: AnalysisRequest):
 @app.post("/transcribe_and_analyze")
 async def transcribe_and_analyze(
     file: UploadFile = File(...),
-    patient_context: str = None
+    patient_id: int = None
+    #patient_context: str = None
 ):
     """
     Endpoint combinado: transcribe un archivo y lo analiza automáticamente
@@ -139,7 +140,7 @@ async def transcribe_and_analyze(
         # Analizar la transcripción
         analysis = medical_analysis_service.analyze_transcription(
             transcription=transcription_result["full_text"],
-            patient_context=patient_context
+            patient_id=patient_id
         )
         
         return {
