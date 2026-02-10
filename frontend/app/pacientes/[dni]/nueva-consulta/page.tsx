@@ -327,11 +327,39 @@ export default function NuevaConsultaPage({ params }: { params: Promise<{ dni: s
 
       // Save consultation as embedding for future AI retrieval
       const url = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
+      
+      // Construir contexto rico para mejores búsquedas de similitud
+      
+      const pageContent = `
+      CONSULTA MÉDICA
+
+      --- MOTIVO DE CONSULTA ---
+      ${motivoConsulta || 'No especificado'}
+
+      --- ANAMNESIS ---
+      ${anamnesis || 'No registrada'}
+
+      --- PRUEBAS COMPLEMENTARIAS ---
+      ${pruebasComplementarias || 'No se solicitaron pruebas'}
+
+      --- DIAGNÓSTICO FINAL ---
+      ${diagnostico || 'No especificado'}
+
+      ${aiAnalysisResumen ? `--- RESUMEN IA ---\n${aiAnalysisResumen}` : ''}
+      `.trim();
+
+      const metadata = {
+        patientId: patient.dni,
+        fecha: new Date().toISOString(),
+      };
+
       await fetch(`${url}/generate_embeddings`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          
+          page_content: pageContent,
+          metadata: metadata
+        })
       })
 
       // Redirect back to patient detail

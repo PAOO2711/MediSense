@@ -22,8 +22,9 @@ class EmbeddingsService:
         self.supabase :Client = create_client(supabase_url, supabase_key)
 
     def create_embeddings(self, doc: Document):
+
         self.vector_store = SupabaseVectorStore.from_documents(
-            doc,
+            [doc],  # from_documents espera una lista
             self.embeddings,
             client = self.supabase,
             table_name = "documents",

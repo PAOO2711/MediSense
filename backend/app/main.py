@@ -159,7 +159,7 @@ async def transcribe_and_analyze(
 @app.post("/generate_embeddings")
 async def generate_embeddings(
     page_content: str,
-    metadata: dict
+    metadata: dict,
 ):
     """
     Genera embeddings para un documento y los almacena en Supabase
@@ -167,7 +167,6 @@ async def generate_embeddings(
     Args:
         page_content: Contenido del documento
         metadata: Metadatos asociados al documento
-
     """
     try:
         medical_analysis_service.generate_embeddings(page_content, metadata)
