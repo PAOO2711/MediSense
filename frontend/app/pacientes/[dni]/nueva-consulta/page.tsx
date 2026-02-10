@@ -325,6 +325,15 @@ export default function NuevaConsultaPage({ params }: { params: Promise<{ dni: s
         }
       }
 
+      // Save consultation as embedding for future AI retrieval
+      const url = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
+      await fetch(`${url}/generate_embeddings`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          
+      })
+
       // Redirect back to patient detail
       router.push(`/pacientes/${patient.dni}`);
       

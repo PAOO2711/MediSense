@@ -137,10 +137,14 @@ async def transcribe_and_analyze(
             file.filename
         )
         
+        # Generar resumen rápido
+        #quick_summary = medical_analysis_service.quick_summary(transcription_result["full_text"])
+        
         # Analizar la transcripción
         analysis = medical_analysis_service.analyze_transcription(
             transcription=transcription_result["full_text"],
             patient_id=patient_id
+            # Agreagar resumen
         )
         
         return {
@@ -150,6 +154,25 @@ async def transcribe_and_analyze(
         
     except Exception as e:
         logger.error(f"Error en transcripción y análisis: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/generate_embeddings")
+async def generate_embeddings(
+    page_content: str,
+    metadata: dict
+):
+    """
+    Genera embeddings para un documento y los almacena en Supabase
+    
+    Args:
+        page_content: Contenido del documento
+        metadata: Metadatos asociados al documento
+
+    """
+    try:
+        medical_analysis_service.generate_embeddings(page_content, metadata)
+    except Exception as e:
+        logger.error(f"Error generando embeddings: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/health")

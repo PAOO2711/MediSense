@@ -10,6 +10,7 @@ from typing import Optional
 from app.config.settings import settings
 from app.models.schemas import MedicalAnalysis
 from app.services.embeddings import EmbeddingsService
+from langchain_core.documents import Document
 
 logger = logging.getLogger(__name__)
 
@@ -174,6 +175,17 @@ class MedicalAnalysisService:
             
         except Exception as e:
             logger.error(f"❌ Error generando resumen: {e}")
+            raise
+
+
+    def generate_embeddings(self, page_content: str, metadata: dict):
+        """Genera embeddings para un documento y los almacena en Supabase"""
+        try:
+            doc = Document(page_content=page_content, metadata=metadata)
+            self.embeddings_service.create_embeddings(doc)
+            logger.info("✅ Embeddings generados y almacenados correctamente")
+        except Exception as e:
+            logger.error(f"❌ Error generando embeddings: {e}")
             raise
 
 # Instancia global del servicio
