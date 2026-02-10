@@ -349,7 +349,7 @@ export default function NuevaConsultaPage({ params }: { params: Promise<{ dni: s
       `.trim();
 
       const metadata = {
-        patientId: patient.dni,
+        patient_id: patient.dni,
         fecha: new Date().toISOString(),
       };
 
