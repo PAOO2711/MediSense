@@ -88,7 +88,7 @@ export async function login(
 
     // Revalidar y redirigir
     revalidatePath('/', 'layout')
-    redirect('/dashboard')
+    redirect('/pacientes')
   } catch (error) {
     // Si es un redirect, lo dejamos pasar
     if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
@@ -133,9 +133,6 @@ export async function signup(
     const { error } = await supabase.auth.signUp({
       email,
       password,
-      options: {
-        emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
-      },
     })
 
     if (error) {
@@ -149,7 +146,7 @@ export async function signup(
 
     // Revalidar y redirigir a login
     revalidatePath('/', 'layout')
-    redirect('/login?registered=true')
+    redirect('/login')
   } catch (error) {
     // Si es un redirect, lo dejamos pasar
     if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
