@@ -2,41 +2,8 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
-
-// Schemas de validación con Zod
-export const loginSchema = z.object({
-  email: z
-    .string()
-    .min(1, 'El correo es requerido')
-    .email('Correo electrónico inválido'),
-  password: z
-    .string()
-    .min(6, 'La contraseña debe tener al menos 6 caracteres'),
-})
-
-export const signupSchema = z.object({
-  email: z
-    .string()
-    .min(1, 'El correo es requerido')
-    .email('Correo electrónico inválido'),
-  password: z
-    .string()
-    .min(6, 'La contraseña debe tener al menos 6 caracteres')
-    .regex(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-      'La contraseña debe contener al menos una mayúscula, una minúscula y un número'
-    ),
-  confirmPassword: z.string().min(1, 'Confirma tu contraseña'),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: 'Las contraseñas no coinciden',
-  path: ['confirmPassword'],
-})
-
-// Tipos derivados de los schemas
-export type LoginInput = z.infer<typeof loginSchema>
-export type SignupInput = z.infer<typeof signupSchema>
+import { loginSchema, signupSchema } from '@/lib/validation/auth'
 
 // Tipo de respuesta de las acciones
 type ActionResponse = {
