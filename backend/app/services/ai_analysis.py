@@ -130,10 +130,11 @@ class MedicalAnalysisService:
                 - Medicamentos que el paciente esté tomando actualmente o haya tomado recientemente
                 """
 
+            # Recuperar contexto del paciente usando embeddings
             patient_context = self.embeddings_service.retrieve_similar_cases(query=query, top_k=5, patient_id=patient_id)
 
-            logger.info(f"📚 Contexto recuperado: {len(patient_context)} casos similares encontrados para el paciente_id={patient_id}")
-            logger.info(f"CONTEXTO RECUPERADO: {patient_context}")
+            #logger.info(f"📚 Contexto recuperado: {len(patient_context)} casos similares encontrados para el paciente_id={patient_id}")
+            #logger.info(f"CONTEXTO RECUPERADO: {patient_context}")
             
             # Formatear contexto del paciente de forma legible
             if patient_context and len(patient_context) > 0:
