@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { loginSchema, signupSchema } from '@/lib/validation/auth'
+import { loginSchema, signupSchema } from '@/lib/schemas/auth'
 
 // Tipo de respuesta de las acciones
 type ActionResponse = {

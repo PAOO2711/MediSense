@@ -30,6 +30,8 @@ import {
   Activity
 } from 'lucide-react';
 import type { Patient } from '@/types/consultation';
+import { useActionState } from 'react';
+import { logout } from '@/app/actions/auth';
 
 type SortBy = 'name' | 'dni' | 'createdAt';
 type SortOrder = 'asc' | 'desc';
@@ -100,6 +102,17 @@ export default function PacientesPage() {
       : <ArrowDown className="ml-2 h-4 w-4 text-teal-600" />;
   };
 
+  const handleLogout = async () => {
+    try {
+      const response = await logout();
+      if (response.success) {
+        router.push('/login');
+      }
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error);
+    }
+  };
+
   const handleViewPatient = (dni: number) => {
     router.push(`/pacientes/${dni}`);
   };
@@ -121,6 +134,14 @@ export default function PacientesPage() {
               <Activity className="h-5 w-5 text-green-300 animate-pulse" />
               <span className="text-sm text-blue-100">Sistema activo</span>
             </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleLogout}
+              className="ml-6 border-white text-white hover:bg-white hover:text-teal-600"
+            >
+              Cerrar sesión
+            </Button>
           </div>
         </div>
       </div>
