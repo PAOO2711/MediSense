@@ -117,6 +117,10 @@ export default function PacientesPage() {
     router.push(`/pacientes/${dni}`);
   };
 
+  const handleCreatePatient = () => {
+    router.push('/pacientes/new');
+  };
+
   return (
     <div className="min-h-screen bg-white">
       {/* Header con gradiente médico */}
@@ -164,7 +168,9 @@ export default function PacientesPage() {
                   </CardDescription>
                 </div>
               </div>
-              <Button className="bg-teal-600 hover:bg-teal-700 text-white gap-2 shadow-md">
+              <Button 
+                onClick={handleCreatePatient}
+                className="bg-teal-600 hover:bg-teal-700 text-white gap-2 shadow-md">
                 <UserPlus className="h-4 w-4" />
                 Nuevo Paciente
               </Button>
