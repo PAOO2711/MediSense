@@ -6,7 +6,7 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     
-    const { dni, name, email, phone, dateOfBirth } = body;
+    const { dni, name, email, dateOfBirth, phone } = body;
 
     if (!dni || !name) {
       return NextResponse.json(
@@ -19,8 +19,8 @@ export async function POST(request: NextRequest) {
       dni: parseInt(dni),
       name,
       email,
-      phone,
       dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : undefined,
+      phone,
     });
 
     return NextResponse.json(patient, { status: 201 });

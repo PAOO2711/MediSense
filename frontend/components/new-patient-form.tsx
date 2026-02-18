@@ -1,8 +1,7 @@
 "use client"
 
-import { useActionState } from "react"
-import { useFormStatus } from "react-dom"
-
+import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -12,7 +11,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { Checkbox } from "@/components/ui/checkbox"
 import {
   Field,
   FieldGroup,
@@ -20,28 +18,64 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { HeartPulse } from "lucide-react"
-import { createPatient } from "@/app/actions/patient"
-
-function SubmitButton() {
-  const { pending } = useFormStatus()
-
-  return (
-    <Button
-      type="submit"
-      className="w-full bg-teal-600 text-white hover:bg-teal-700"
-      disabled={pending}
-    >
-      {pending ? "Ingresando..." : "Ingresar"}
-    </Button>
-  )
-}
 
 export function CreatePatientForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const router = useRouter()
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
 
-  const [state, formAction] = useActionState(createPatient, null)
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    setError(null)
+    setLoading(true)
+
+    try {
+      const formData = new FormData(e.currentTarget)
+      const dni = formData.get('dni')
+      const name = formData.get('name')
+      const email = formData.get('email')
+      const birthdate = formData.get('birthdate')
+      const phone = formData.get('phone')
+
+      // Convertir fecha si viene en formato MM/DD/YYYY
+      let dateOfBirth = birthdate
+      if (typeof birthdate === 'string' && birthdate && birthdate.includes('/')) {
+        const [month, day, year] = birthdate.split('/')
+        dateOfBirth = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+      }
+
+      const response = await fetch('/api/patients/new', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          dni,
+          name,
+          email,
+          dateOfBirth,
+          phone,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok || data.error) {
+        setError(data.error || 'Error al crear el paciente')
+        return
+      }
+
+      // Éxito - redirigir
+      router.push('/pacientes')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error inesperado')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -62,7 +96,7 @@ export function CreatePatientForm({
           </div>
         </CardHeader>
         <CardContent className="pt-2">
-          <form className="space-y-6" action={formAction}>
+          <form className="space-y-6" onSubmit={handleSubmit}>
             <FieldGroup className="gap-5">
               <Field>
                 <FieldLabel htmlFor="dni" className="text-slate-700">
@@ -75,6 +109,7 @@ export function CreatePatientForm({
                   placeholder="12345678"
                   className="border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus:border-teal-500 focus:ring-teal-500"
                   required
+                  disabled={loading}
                 />
               </Field>
               <Field>
@@ -88,6 +123,7 @@ export function CreatePatientForm({
                   placeholder="Juan Pérez"
                   className="border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus:border-teal-500 focus:ring-teal-500"
                   required
+                  disabled={loading}
                 />
               </Field>
               <Field>
@@ -101,6 +137,7 @@ export function CreatePatientForm({
                   placeholder="nombre@hospital.com"
                   className="border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus:border-teal-500 focus:ring-teal-500"
                   required
+                  disabled={loading}
                 />
               </Field>
               <Field>
@@ -114,6 +151,7 @@ export function CreatePatientForm({
                   placeholder="12/31/1990"
                   className="border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus:border-teal-500 focus:ring-teal-500"
                   required
+                  disabled={loading}
                 />
               </Field>
               <Field>
@@ -127,12 +165,25 @@ export function CreatePatientForm({
                   placeholder="123-456-7890"
                   className="border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus:border-teal-500 focus:ring-teal-500"
                   required
+                  disabled={loading}
                 />
               </Field>
             </FieldGroup>
 
             <div className="space-y-3">
-              <SubmitButton />
+              <Button
+                type="submit"
+                className="w-full bg-teal-600 text-white hover:bg-teal-700"
+                disabled={loading}
+              >
+                {loading ? "Creando..." : "Crear paciente"}
+              </Button>
+              {error && (
+                <div className="rounded-md bg-red-50 p-3 text-sm text-red-700 border border-red-200">
+                  <p className="font-semibold">Error:</p>
+                  <p className="mt-1">{error}</p>
+                </div>
+              )}
             </div>
           </form>
         </CardContent>

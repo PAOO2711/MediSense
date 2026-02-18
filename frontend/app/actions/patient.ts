@@ -26,19 +26,44 @@ export async function createPatient(
       phone: formData.get('phone'),
     }
 
+    console.log('Datos recibidos en createPatient:', rawData)
+
+    // Convertir fecha si viene en formato MM/DD/YYYY
+    let dateOfBirth = rawData.dateOfBirth
+    if (typeof dateOfBirth === 'string' && dateOfBirth) {
+      // Si es formato MM/DD/YYYY, convertir a YYYY-MM-DD
+      if (dateOfBirth.includes('/')) {
+        const [month, day, year] = dateOfBirth.split('/')
+        dateOfBirth = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+      }
+    }
+
+    const dataToSend = {
+      dni: rawData.dni,
+      name: rawData.name,
+      email: rawData.email,
+      phone: rawData.phone,
+      dateOfBirth: dateOfBirth,
+    }
+
+    console.log('Datos a enviar a API:', dataToSend)
+
     // Crear paciente a través de la API
-    const patient = await fetch('/api/patients/new', {
+    const response = await fetch('/api/patients/new', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(rawData),
-    }).then(res => res.json())
+      body: JSON.stringify(dataToSend),
+    })
 
-    if (patient.error) {
+    const patient = await response.json()
+
+    // Verificar si hubo error en la respuesta
+    if (!response.ok || patient.error) {
       return {
         success: false,
-        error: patient.error,
+        error: patient.error || `Error ${response.status}: No se pudo crear el paciente`,
       }
     }
 
