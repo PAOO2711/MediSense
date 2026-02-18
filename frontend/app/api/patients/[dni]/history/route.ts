@@ -3,7 +3,7 @@ import {
   getPatientHistoryByDNI,
   createPatientHistory,
   updatePatientHistoryStatus,
-} from "@/lib/db/queries/queries";
+} from "@/lib/db/queries/index";
 
 // GET /api/patients/[dni]/history
 export async function GET(

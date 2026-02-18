@@ -303,7 +303,12 @@ export default function PatientDetailPage({ params }: { params: Promise<{ dni: s
                             {formatDate(consultation.date)}
                           </div>
                         </div>
-                        <Button variant="ghost" size="sm" className="text-teal-600 hover:text-teal-700 hover:bg-teal-50">
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          onClick={() => router.push(`/pacientes/${patient.dni}/consultas/${consultation.id}`)}
+                          className="text-teal-600 hover:text-teal-700 hover:bg-teal-50"
+                        >
                           Ver detalles
                         </Button>
                       </div>

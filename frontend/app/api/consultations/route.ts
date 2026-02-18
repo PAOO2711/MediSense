@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     
-    const { patientId, title, motivoConsulta, anamnesis, pruebas, recomendaciones, status } = body;
+    const { patientId, title, motivoConsulta, anamnesis, pruebas, diagnostico, recomendaciones, status } = body;
 
     if (!patientId || !title) {
       return NextResponse.json(
@@ -42,6 +42,7 @@ export async function POST(request: NextRequest) {
       motivoConsulta,
       anamnesis,
       pruebas,
+      diagnostico,
       recomendaciones,
       status,
     });

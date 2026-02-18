@@ -151,6 +151,7 @@ export default function ConsultaDetailPage({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div>
+                <a href={`/pacientes/${patient?.dni}`}>
                 <h1 className="text-2xl font-bold">Detalle de Consulta</h1>
                 {patient && (
                   <div className="flex items-center gap-2 text-blue-100 mt-1">
@@ -160,6 +161,7 @@ export default function ConsultaDetailPage({
                     <span>DNI: {patient.dni}</span>
                   </div>
                 )}
+                </a>
               </div>
             </div>
             <div className="flex items-center gap-2 text-blue-100">

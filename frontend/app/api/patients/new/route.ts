@@ -15,12 +15,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const phoneTrimmed = phone ? phone.trim() : undefined;
+    const emailTrimmed = email ? email.trim() : undefined;
+
     const patient = await createPatient({
       dni: parseInt(dni),
       name,
-      email,
+      email: emailTrimmed,
       dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : undefined,
-      phone,
+      phone: phoneTrimmed,
     });
 
     return NextResponse.json(patient, { status: 201 });

@@ -106,7 +106,7 @@ export function CreatePatientForm({
                   id="dni"
                   name="dni"
                   type="text"
-                  placeholder="12345678"
+                  placeholder="12345678F"
                   className="border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus:border-teal-500 focus:ring-teal-500"
                   required
                   disabled={loading}
@@ -162,7 +162,7 @@ export function CreatePatientForm({
                   id="phone"
                   name="phone"
                   type="text"
-                  placeholder="123-456-7890"
+                  placeholder="682102872"
                   className="border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus:border-teal-500 focus:ring-teal-500"
                   required
                   disabled={loading}
