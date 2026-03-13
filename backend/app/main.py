@@ -2,7 +2,7 @@
 API principal de MediSense - Versión refactorizada
 Sistema de transcripción y análisis médico con IA
 """
-from fastapi import FastAPI, UploadFile, File, HTTPException, Form, Body
+from fastapi import FastAPI, UploadFile, File, HTTPException, Form, Body, Depends
 from fastapi.middleware.cors import CORSMiddleware
 import logging
 import sys
@@ -16,6 +16,7 @@ from app.config.settings import settings
 from app.models.schemas import TranscriptionResponse, MedicalAnalysis, AnalysisRequest
 from app.services.transcription import transcription_service
 from app.services.ai_analysis import medical_analysis_service
+from app.security.auth import get_current_user
 
 # Configurar logging
 logging.basicConfig(
@@ -81,7 +82,10 @@ async def transcribe_uploaded_file(file: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/analyze", response_model=MedicalAnalysis)
-async def analyze_transcription(request: AnalysisRequest):
+async def analyze_transcription(
+    request: AnalysisRequest,
+    current_user: dict = Depends(get_current_user),
+):
     """
     Analiza una transcripción médica y genera sugerencias para el médico
     
