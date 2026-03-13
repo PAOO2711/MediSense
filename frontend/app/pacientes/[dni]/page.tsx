@@ -222,10 +222,10 @@ export default function PatientDetailPage({ params }: { params: Promise<{ dni: s
                   <Edit className="h-4 w-4" />
                   Editar paciente
                 </Button>
-                <Button variant="outline" className="w-full text-red-600 border-red-200 hover:text-red-700 hover:bg-red-50 gap-2">
+                {/* <Button variant="outline" className="w-full text-red-600 border-red-200 hover:text-red-700 hover:bg-red-50 gap-2">
                   <Trash2 className="h-4 w-4" />
                   Eliminar paciente
-                </Button>
+                </Button> */}
               </div>
             </CardContent>
           </Card>
@@ -282,6 +282,7 @@ export default function PatientDetailPage({ params }: { params: Promise<{ dni: s
                     <div 
                       key={consultation.id}
                       className="p-4 rounded-lg border border-gray-200 hover:border-teal-300 hover:shadow-md transition-all cursor-pointer bg-white"
+                      onClick={() => router.push(`/pacientes/${patient.dni}/consultas/${consultation.id}`)}
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
@@ -305,7 +306,7 @@ export default function PatientDetailPage({ params }: { params: Promise<{ dni: s
                         </div>
                         <Button 
                           variant="ghost" 
-                          size="sm" 
+                          size="lg" 
                           onClick={() => router.push(`/pacientes/${patient.dni}/consultas/${consultation.id}`)}
                           className="text-teal-600 hover:text-teal-700 hover:bg-teal-50"
                         >

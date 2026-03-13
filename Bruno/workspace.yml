@@ -1,0 +1,12 @@
+opencollection: 1.0.0
+info:
+  name: "Bruno"
+  type: workspace
+
+collections:
+  - name: "AI Service"
+    path: "collections/AI Service"
+
+specs:
+
+docs: ''
