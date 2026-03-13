@@ -183,8 +183,14 @@ export default function NuevaConsultaPage({ params }: { params: Promise<{ dni: s
       formData.append('file', audioBlob, 'recording.webm');
       formData.append('patient_id', resolvedParams.dni); // Pasar el DNI del paciente para contexto adicional
 
+      //const { data: { session } } = await supabase.auth.getSession();
+
       const response = await fetch('http://localhost:8000/transcribe_and_analyze', {
         method: 'POST',
+        /* headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${session?.access_token}`,
+        }, */
         body: formData
       });
 

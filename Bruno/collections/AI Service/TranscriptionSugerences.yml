@@ -13,7 +13,9 @@ http:
         "transcription": "Buenos días, ¿qué le trae hoy a la consulta? Hola, doctor. Pues ayer tuve una reacción alérgica bastante fuerte. Creo que fue por comer algo con cacahuetes. Entiendo. ¿Es usted alérgico a los cacahuetes? Sí, desde pequeño. Normalmente tengo mucho cuidado, pero ayer estaba cenando fuera y parece que el plato tenía algo de cacahuete o trazas. ¿Qué síntomas tuvo exactamente? Primero noté picor en la boca y en la garganta. Después me empezaron a salir ronchas en los brazos y el pecho. También sentía la garganta un poco cerrada. ¿Tuvo dificultad para respirar? Un poco, sí. No era muy fuerte, pero me asusté bastante. Hizo bien en venir. ¿Tomó algún medicamento en ese momento? Sí, tomé un antihistamínico que suelo llevar conmigo. Después de un rato los síntomas empezaron a mejorar. Bien. Cuando hay alergia a los cacahuetes existe riesgo de reacciones más graves, incluso anafilaxia. ¿Tiene autoinyector de adrenalina? No, nunca me lo han recetado. En su caso sería recomendable llevar uno siempre, por si vuelve a ocurrir una reacción fuerte. También es importante preguntar siempre en restaurantes por posibles trazas de cacahuete. Sí, normalmente lo hago, pero esta vez se me pasó preguntar por la salsa. Lo entiendo, a veces es difícil controlarlo todo. Vamos a revisar su historial y le voy a recetar un autoinyector de adrenalina, además de antihistamínicos para tener en casa. Perfecto, muchas gracias, doctor. De nada. Y si vuelve a notar síntomas como dificultad para respirar, hinchazón en la cara o mareo, use el autoinyector y acuda a urgencias inmediatamente. De acuerdo, lo tendré en cuenta. Muchas gracias.",
         "patient_id": 12345678
       }
-  auth: inherit
+  auth:
+    type: bearer
+    token: "{{JWT_TOKEN}}"
 
 settings:
   encodeUrl: true

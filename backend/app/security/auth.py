@@ -35,9 +35,7 @@ def get_current_user(
 
         return {
             "user_id": user_id,
-            "email": payload.get("email"),
-            "role": payload.get("role"),  # "authenticated" para usuarios normales
-            "app_metadata": payload.get("app_metadata", {}),
+            #"role": payload.get("role"),  # "authenticated" para usuarios normales
         }
 
     except JWTError as e:
