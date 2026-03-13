@@ -23,8 +23,6 @@ class EmbeddingsService:
 
     def create_embeddings(self, doc: Document):
 
-        
-        
         self.vector_store = SupabaseVectorStore.from_documents(
             [doc],  # from_documents espera una lista
             self.embeddings,

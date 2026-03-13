@@ -339,9 +339,6 @@ export default function NuevaConsultaPage({ params }: { params: Promise<{ dni: s
       --- ANAMNESIS ---
       ${anamnesis || 'No registrada'}
 
-      --- PRUEBAS COMPLEMENTARIAS ---
-      ${pruebasComplementarias || 'No se solicitaron pruebas'}
-
       --- DIAGNÓSTICO FINAL ---
       ${diagnostico || 'No especificado'}
 
