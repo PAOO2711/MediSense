@@ -46,6 +46,7 @@ class MedicalAnalysisService:
             # Crear el prompt template
             system_prompt = """Eres un asistente médico experto que analiza transcripciones de consultas médicas.
             Tu objetivo es ayudar al médico identificando síntomas y sugiriendo posibles diagnósticos.
+            
 
             IMPORTANTE:
             - Sé preciso y objetivo
@@ -66,13 +67,7 @@ class MedicalAnalysisService:
 
             {format_instructions}"""
             
-            user_prompt = """Analiza la siguiente transcripción de una consulta médica:
-
-            TRANSCRIPCIÓN:
-            {transcription}
-
-            {context_section}
-
+            user_prompt = """Analiza la siguiente transcripción de una consulta médica y ten en cuenta el contexto del paciente si lo hubiese.
             Proporciona un análisis estructurado que ayude al médico a:
             1. Generar un resumen breve e informativo de la consulta
             2. Identificar todos los síntomas mencionados por el paciente
@@ -80,7 +75,15 @@ class MedicalAnalysisService:
             4. Sugerir posibles condiciones médicas a considerar (tipo: "condition")
             5. Recomendar exámenes, pruebas o acciones (tipo: "recommendation")
 
-            Sé claro, conciso y profesional. Proporciona justificaciones sólidas para cada sugerencia."""
+            Sé claro, conciso y profesional. Proporciona justificaciones sólidas para cada sugerencia.
+
+            TRANSCRIPCIÓN:
+            {transcription}
+
+            CONTEXTO DEL PACIENTE:
+            {context_section}
+
+            """
 
             self.prompt = ChatPromptTemplate.from_messages([
                 ("system", system_prompt),

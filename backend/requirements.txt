@@ -21,6 +21,7 @@ decorator==5.2.1
 deprecation==2.1.0
 dill==0.4.0
 distro==1.9.0
+ecdsa==0.19.1
 fastapi==0.116.1
 faster-whisper==1.2.0
 ffmpeg-python==0.2.0
@@ -54,10 +55,10 @@ Jinja2==3.1.6
 joblib==1.5.2
 jsonpatch==1.33
 jsonpointer==3.0.0
-langchain==1.2.9
+langchain==1.2.10
 langchain-classic==1.0.0
 langchain-community==0.4.1
-langchain-core==1.2.9
+langchain-core==1.2.10
 langchain-google-genai==3.0.0
 langchain-groq==1.1.1
 langchain-huggingface==1.2.0
@@ -105,7 +106,7 @@ pandas==2.3.2
 pillow==11.0.0
 platformdirs==4.4.0
 pooch==1.8.2
-postgrest==2.27.3
+postgrest==2.28.0
 propcache==0.3.2
 proto-plus==1.26.1
 protobuf==6.32.1
@@ -125,10 +126,11 @@ pyparsing==3.3.2
 pyroaring==1.0.3
 python-dateutil==2.9.0.post0
 python-dotenv==1.1.1
+python-jose==3.5.0
 python-multipart==0.0.20
 pytz==2025.2
 PyYAML==6.0.2
-realtime==2.27.3
+realtime==2.28.0
 regex==2025.9.18
 requests==2.32.5
 requests-toolbelt==1.0.0
@@ -146,12 +148,12 @@ soundfile==0.13.1
 soxr==1.0.0
 SQLAlchemy==2.0.44
 starlette==0.47.3
-storage3==2.27.3
+storage3==2.28.0
 StrEnum==0.4.15
 strictyaml==1.7.3
-supabase==2.27.3
-supabase-auth==2.27.3
-supabase-functions==2.27.3
+supabase==2.28.0
+supabase-auth==2.28.0
+supabase-functions==2.28.0
 sympy==1.14.0
 tenacity==9.1.2
 threadpoolctl==3.6.0
@@ -174,4 +176,3 @@ websockets==15.0.1
 xxhash==3.5.0
 yarl==1.22.0
 zstandard==0.25.0
-python-jose[cryptography]

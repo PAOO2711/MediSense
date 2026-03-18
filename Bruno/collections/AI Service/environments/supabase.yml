@@ -1,4 +1,0 @@
-name: supabase
-variables:
-  - secret: true
-    name: JWT_TOKEN
