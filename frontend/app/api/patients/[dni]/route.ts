@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPatientByDNI } from '@/lib/db/queries';
 import { db } from '@/lib/db';
 import { patients } from '@/lib/db/schema';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
+import { requireUser, UnauthorizedError } from '@/lib/auth/require-user';
 
 // GET /api/patients/[dni] - Obtener un paciente por DNI
 export async function GET(
@@ -10,8 +11,9 @@ export async function GET(
   { params }: { params: Promise<{ dni: string }> }
 ) {
   try {
+    const user = await requireUser();
     const { dni } = await params;
-    const patient = await getPatientByDNI(parseInt(dni));
+    const patient = await getPatientByDNI(parseInt(dni), user.id);
 
     if (!patient) {
       return NextResponse.json(
@@ -22,6 +24,9 @@ export async function GET(
 
     return NextResponse.json(patient);
   } catch (error) {
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
     console.error('Error fetching patient:', error);
     return NextResponse.json(
       { error: 'Error al obtener paciente' },
@@ -36,6 +41,7 @@ export async function PUT(
   { params }: { params: Promise<{ dni: string }> }
 ) {
   try {
+    const user = await requireUser();
     const { dni } = await params;
     const body = await request.json();
     
@@ -50,7 +56,7 @@ export async function PUT(
         dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : undefined,
         updatedAt: new Date(),
       })
-      .where(eq(patients.dni, parseInt(dni)))
+      .where(and(eq(patients.dni, parseInt(dni)), eq(patients.ownerId, user.id)))
       .returning();
 
     if (!updated) {
@@ -62,6 +68,9 @@ export async function PUT(
 
     return NextResponse.json(updated);
   } catch (error) {
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
     console.error('Error updating patient:', error);
     return NextResponse.json(
       { error: 'Error al actualizar paciente' },
@@ -76,11 +85,12 @@ export async function DELETE(
   { params }: { params: Promise<{ dni: string }> }
 ) {
   try {
+    const user = await requireUser();
     const { dni } = await params;
     
     const [deleted] = await db
       .delete(patients)
-      .where(eq(patients.dni, parseInt(dni)))
+      .where(and(eq(patients.dni, parseInt(dni)), eq(patients.ownerId, user.id)))
       .returning();
 
     if (!deleted) {
@@ -92,6 +102,9 @@ export async function DELETE(
 
     return NextResponse.json({ message: 'Paciente eliminado correctamente' });
   } catch (error) {
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
     console.error('Error deleting patient:', error);
     return NextResponse.json(
       { error: 'Error al eliminar paciente' },
