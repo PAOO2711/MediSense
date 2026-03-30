@@ -1,0 +1,2 @@
+ALTER TABLE "patients" ADD COLUMN "owner_id" uuid DEFAULT auth.uid() NOT NULL;--> statement-breakpoint
+ALTER TABLE "patients" ADD CONSTRAINT "patients_owner_id_users_id_fk" FOREIGN KEY ("owner_id") REFERENCES "auth"."users"("id") ON DELETE restrict ON UPDATE no action;
