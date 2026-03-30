@@ -30,7 +30,6 @@ import {
   Activity
 } from 'lucide-react';
 import type { Patient } from '@/types/consultation';
-import { useActionState } from 'react';
 import { logout } from '@/app/actions/auth';
 
 type SortBy = 'name' | 'dni' | 'createdAt';
@@ -63,12 +62,22 @@ export default function PacientesPage() {
         method: 'GET',
       });
       const result = await response.json();
+
+      if (!response.ok) {
+        setPatients([]);
+        setTotalPages(1);
+        setTotal(0);
+        return;
+      }
       
-      setPatients(result.data);
-      setTotalPages(result.totalPages);
-      setTotal(result.total);
+      setPatients(Array.isArray(result.data) ? result.data : []);
+      setTotalPages(typeof result.totalPages === 'number' && result.totalPages > 0 ? result.totalPages : 1);
+      setTotal(typeof result.total === 'number' ? result.total : 0);
     } catch (error) {
       console.error('Error fetching patients:', error);
+      setPatients([]);
+      setTotalPages(1);
+      setTotal(0);
     } finally {
       setLoading(false);
     }

@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { getUserRole } from '@/lib/auth/require-user'
 import { loginSchema, signupSchema } from '@/lib/schemas/auth'
 
 // Tipo de respuesta de las acciones
@@ -39,23 +40,32 @@ export async function login(
 
     // Autenticar con Supabase
     const supabase = await createClient()
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     })
 
     if (error) {
+      const normalizedMessage = error.message.toLowerCase()
+      const readableError =
+        error.message === 'Invalid login credentials'
+          ? 'Credenciales inválidas'
+          : normalizedMessage.includes('email not confirmed')
+            ? 'Este usuario aún no está confirmado. Contacta con el administrador.'
+            : normalizedMessage.includes('invalid email or password')
+              ? 'Credenciales inválidas'
+              : `Error al iniciar sesión: ${error.message}`
+
       return {
         success: false,
-        error: error.message === 'Invalid login credentials'
-          ? 'Credenciales inválidas'
-          : 'Error al iniciar sesión. Intenta de nuevo.',
+        error: readableError,
       }
     }
 
     // Revalidar y redirigir
     revalidatePath('/', 'layout')
-    redirect('/pacientes')
+    const role = data.user?.id ? await getUserRole(data.user.id) : null
+    redirect(role === 'admin' ? '/admin' : '/pacientes')
   } catch (error) {
     // Si es un redirect, lo dejamos pasar
     if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
