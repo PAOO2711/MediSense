@@ -1,8 +1,9 @@
 'use server'
 
+import { headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { auth } from '@/lib/auth'
 import { loginSchema, signupSchema } from '@/lib/schemas/auth'
 
 // Tipo de respuesta de las acciones
@@ -37,21 +38,13 @@ export async function login(
 
     const { email, password } = validatedData.data
 
-    // Autenticar con Supabase
-    const supabase = await createClient()
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
+    await auth.api.signInEmail({
+      headers: await headers(),
+      body: {
+        email,
+        password,
+      },
     })
-
-    if (error) {
-      return {
-        success: false,
-        error: error.message === 'Invalid login credentials'
-          ? 'Credenciales inválidas'
-          : 'Error al iniciar sesión. Intenta de nuevo.',
-      }
-    }
 
     // Revalidar y redirigir
     revalidatePath('/', 'layout')
@@ -60,6 +53,16 @@ export async function login(
     // Si es un redirect, lo dejamos pasar
     if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
       throw error
+    }
+
+    if (
+      error instanceof Error &&
+      error.message.toLowerCase().includes('invalid')
+    ) {
+      return {
+        success: false,
+        error: 'Credenciales inválidas',
+      }
     }
 
     return {
@@ -95,21 +98,14 @@ export async function signup(
 
     const { email, password } = validatedData.data
 
-    // Registrar con Supabase
-    const supabase = await createClient()
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
+    await auth.api.signUpEmail({
+      headers: await headers(),
+      body: {
+        email,
+        password,
+        name: email.split('@')[0],
+      },
     })
-
-    if (error) {
-      return {
-        success: false,
-        error: error.message === 'User already registered'
-          ? 'Este correo ya está registrado'
-          : 'Error al registrarse. Intenta de nuevo.',
-      }
-    }
 
     // Revalidar y redirigir a login
     revalidatePath('/', 'layout')
@@ -118,6 +114,16 @@ export async function signup(
     // Si es un redirect, lo dejamos pasar
     if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
       throw error
+    }
+
+    if (
+      error instanceof Error &&
+      error.message.toLowerCase().includes('exist')
+    ) {
+      return {
+        success: false,
+        error: 'Este correo ya está registrado',
+      }
     }
 
     return {
@@ -132,15 +138,9 @@ export async function signup(
  */
 export async function logout(): Promise<ActionResponse> {
   try {
-    const supabase = await createClient()
-    const { error } = await supabase.auth.signOut()
-
-    if (error) {
-      return {
-        success: false,
-        error: 'Error al cerrar sesión',
-      }
-    }
+    await auth.api.signOut({
+      headers: await headers(),
+    })
 
     revalidatePath('/', 'layout')
     redirect('/login')

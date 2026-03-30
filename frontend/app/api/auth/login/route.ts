@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { auth } from '@/lib/auth';
 
 // POST /api/auth/login
-// Útil para Bruno y herramientas de testing: devuelve el access_token de Supabase
+// Útil para Bruno y herramientas de testing: inicia sesión y devuelve cookie de sesión
 export async function POST(request: NextRequest) {
   try {
     const { email, password } = await request.json();
@@ -14,32 +14,30 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = await createClient();
-
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
+    const response = await auth.api.signInEmail({
+      headers: request.headers,
+      body: {
+        email,
+        password,
+      },
+      asResponse: true,
     });
 
-    if (error) {
+    if (!response.ok) {
       return NextResponse.json(
-        { error: error.message === 'Invalid login credentials'
-            ? 'Credenciales inválidas'
-            : error.message
-        },
+        { error: 'Credenciales inválidas' },
         { status: 401 }
       );
     }
 
-    return NextResponse.json({
-      access_token: data.session?.access_token,
-      token_type: 'bearer',
-      expires_in: data.session?.expires_in,
-      user: {
-        id: data.user?.id,
-        email: data.user?.email,
-      },
-    });
+    const result = NextResponse.json({ success: true, message: 'Login correcto' });
+    const setCookie = response.headers.get('set-cookie');
+
+    if (setCookie) {
+      result.headers.set('set-cookie', setCookie);
+    }
+
+    return result;
   } catch {
     return NextResponse.json(
       { error: 'Error inesperado' },

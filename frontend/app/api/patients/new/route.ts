@@ -1,19 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createPatient } from '@/lib/db/queries';
-import { createClient } from '@/lib/supabase/server';
+import { requireUser, UnauthorizedError } from '@/lib/auth/require-user';
 
 // POST /api/patients - Crear un nuevo paciente
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const user = await requireUser();
 
     const body = await request.json();
     const { dni, name, email, dateOfBirth, phone } = body;
@@ -39,6 +31,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(patient, { status: 201 });
   } catch (error) {
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
     console.error('Error creating patient:', error);
     return NextResponse.json({ error: 'Error al crear paciente' }, { status: 500 });
   }

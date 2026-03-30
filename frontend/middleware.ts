@@ -1,8 +1,27 @@
-import { type NextRequest } from "next/server"
-import { updateSession } from "@/lib/supabase/proxy"
+import { getSessionCookie } from 'better-auth/cookies';
+import { type NextRequest, NextResponse } from 'next/server';
 
 export async function middleware(request: NextRequest) {
-  return await updateSession(request)
+  const pathname = request.nextUrl.pathname;
+  const sessionCookie = getSessionCookie(request);
+
+  const isAuthPage =
+    pathname === '/login' || pathname === '/register' || pathname === '/';
+  const isApiRoute = pathname.startsWith('/api');
+
+  if (sessionCookie && isAuthPage) {
+    const url = request.nextUrl.clone();
+    url.pathname = '/pacientes';
+    return NextResponse.redirect(url);
+  }
+
+  if (!sessionCookie && !isAuthPage && !isApiRoute) {
+    const url = request.nextUrl.clone();
+    url.pathname = '/login';
+    return NextResponse.redirect(url);
+  }
+
+  return NextResponse.next();
 }
 
 export const config = {
@@ -16,4 +35,4 @@ export const config = {
      */
     "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
-}
+};
