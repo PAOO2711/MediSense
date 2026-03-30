@@ -1,424 +1,69 @@
-'use client';
+import Link from 'next/link';
+import { ArrowRight, ShieldCheck, UserPlus, UsersRound } from 'lucide-react';
+import { AdminHeader } from '@/components/admin/admin-header';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
-import { FormEvent, useEffect, useMemo, useState } from 'react';
-import { logout } from '@/app/actions/auth';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
-import { Activity, Search, ShieldCheck, Stethoscope, UserCheck, UserPlus, UsersRound } from 'lucide-react';
-
-type Doctor = {
-  id: string;
-  email: string;
-};
+const actions = [
+  {
+    title: 'Crear nuevo médico',
+    description: 'Alta de cuentas médicas para el sistema.',
+    href: '/admin/doctors',
+    icon: UserPlus,
+    accent: 'from-teal-500 to-emerald-500',
+    ring: 'group-hover:ring-teal-300',
+  },
+  {
+    title: 'Crear nuevo paciente',
+    description: 'Registro de paciente con asignación de médico.',
+    href: '/admin/patients',
+    icon: UsersRound,
+    accent: 'from-blue-500 to-cyan-500',
+    ring: 'group-hover:ring-blue-300',
+  },
+];
 
 export default function AdminPage() {
-  const [doctorEmail, setDoctorEmail] = useState('');
-  const [doctorPassword, setDoctorPassword] = useState('');
-  const [creatingDoctor, setCreatingDoctor] = useState(false);
-  const [doctorMessage, setDoctorMessage] = useState<string | null>(null);
-  const [doctorError, setDoctorError] = useState<string | null>(null);
-
-  const [dni, setDni] = useState('');
-  const [name, setName] = useState('');
-  const [patientEmail, setPatientEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [dateOfBirth, setDateOfBirth] = useState('');
-  const [doctorSearch, setDoctorSearch] = useState('');
-  const [doctors, setDoctors] = useState<Doctor[]>([]);
-  const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
-  const [loadingDoctors, setLoadingDoctors] = useState(false);
-  const [creatingPatient, setCreatingPatient] = useState(false);
-  const [patientMessage, setPatientMessage] = useState<string | null>(null);
-  const [patientError, setPatientError] = useState<string | null>(null);
-
-  const hasDoctorSearch = useMemo(() => doctorSearch.trim().length > 0, [doctorSearch]);
-
-  async function onDoctorSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setCreatingDoctor(true);
-    setDoctorMessage(null);
-    setDoctorError(null);
-
-    try {
-      const response = await fetch('/api/admin/users', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email: doctorEmail, password: doctorPassword }),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        setDoctorError(result.error ?? 'No se pudo crear el usuario');
-        return;
-      }
-
-      setDoctorMessage(`Médico creado: ${result.email}`);
-      setDoctorEmail('');
-      setDoctorPassword('');
-    } catch {
-      setDoctorError('Error de red al crear el usuario');
-    } finally {
-      setCreatingDoctor(false);
-    }
-  }
-
-  useEffect(() => {
-    const controller = new AbortController();
-    const timer = setTimeout(async () => {
-      try {
-        setLoadingDoctors(true);
-        const params = new URLSearchParams();
-        if (doctorSearch.trim()) {
-          params.set('q', doctorSearch.trim());
-        }
-        const response = await fetch(`/api/admin/doctors?${params.toString()}`, {
-          method: 'GET',
-          signal: controller.signal,
-        });
-
-        const result = await response.json();
-        if (!response.ok) {
-          setDoctors([]);
-          return;
-        }
-
-        const nextDoctors: Doctor[] = Array.isArray(result.data) ? result.data : [];
-        setDoctors(nextDoctors);
-
-        if (selectedDoctor) {
-          const stillExists = nextDoctors.find((doctor) => doctor.id === selectedDoctor.id);
-          if (!stillExists) {
-            setSelectedDoctor(null);
-          }
-        }
-      } catch (error) {
-        if (error instanceof DOMException && error.name === 'AbortError') {
-          return;
-        }
-        setDoctors([]);
-      } finally {
-        setLoadingDoctors(false);
-      }
-    }, 250);
-
-    return () => {
-      controller.abort();
-      clearTimeout(timer);
-    };
-  }, [doctorSearch, selectedDoctor]);
-
-  async function onPatientSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setPatientMessage(null);
-    setPatientError(null);
-
-    if (!selectedDoctor) {
-      setPatientError('Selecciona un médico para asignar el ownerId.');
-      return;
-    }
-
-    setCreatingPatient(true);
-    try {
-      const response = await fetch('/api/admin/patients', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          dni,
-          name,
-          email: patientEmail,
-          phone,
-          dateOfBirth,
-          ownerId: selectedDoctor.id,
-        }),
-      });
-
-      const result = await response.json();
-      if (!response.ok) {
-        setPatientError(result.error ?? 'No se pudo crear el paciente.');
-        return;
-      }
-
-      setPatientMessage(`Paciente ${result.name} creado y vinculado a ${selectedDoctor.email}.`);
-      setDni('');
-      setName('');
-      setPatientEmail('');
-      setPhone('');
-      setDateOfBirth('');
-      setSelectedDoctor(null);
-    } catch {
-      setPatientError('Error de red al crear el paciente.');
-    } finally {
-      setCreatingPatient(false);
-    }
-  }
-
   return (
     <main className="min-h-screen bg-white">
-      <div className="bg-gradient-to-r from-blue-600 via-blue-500 to-teal-500 text-white">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center gap-3">
-            <div className="rounded-lg bg-white/20 p-2 backdrop-blur-sm">
-              <Stethoscope className="h-8 w-8 text-white" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold">MediSense</h1>
-              <p className="text-sm text-blue-100">Panel de administración</p>
-            </div>
-            <div className="ml-auto flex items-center gap-2">
-              <Activity className="h-5 w-5 animate-pulse text-green-300" />
-              <span className="text-sm text-blue-100">Sistema activo</span>
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                void logout();
-              }}
-              className="ml-6 border-white text-white hover:bg-white hover:text-teal-600"
-            >
-              Cerrar sesión
-            </Button>
-          </div>
-        </div>
-      </div>
+      <AdminHeader subtitle="Panel de administración" />
 
       <div className="container mx-auto px-4 py-8">
-        <Card className="mx-auto w-full max-w-3xl border border-gray-200 bg-white shadow-lg">
+        <Card className="mx-auto max-w-5xl border border-gray-200 bg-white shadow-lg">
           <CardHeader className="border-b border-gray-100 bg-gray-50/50">
-            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-              <div className="flex items-center gap-3">
-                <div className="rounded-lg bg-teal-100 p-2">
-                  <ShieldCheck className="h-5 w-5 text-teal-600" />
-                </div>
-                <div>
-                  <CardTitle className="text-xl text-gray-900">Gestión de médicos</CardTitle>
-                  <CardDescription className="text-gray-500">
-                    Crea cuentas de médico con rol user
-                  </CardDescription>
-                </div>
-              </div>
-              <Button className="bg-teal-600 text-white hover:bg-teal-700" disabled>
-                <UserPlus className="mr-2 h-4 w-4" />
-                Alta de médico
-              </Button>
-            </div>
-          </CardHeader>
-
-          <CardContent className="p-6">
-            <form className="space-y-5" onSubmit={onDoctorSubmit}>
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-gray-700">Email del médico</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  required
-                  value={doctorEmail}
-                  onChange={(event) => setDoctorEmail(event.target.value)}
-                  placeholder="medico@clinic.com"
-                  className="border-gray-300 bg-white text-gray-900"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-gray-700">Contraseña inicial</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  required
-                  minLength={6}
-                  value={doctorPassword}
-                  onChange={(event) => setDoctorPassword(event.target.value)}
-                  placeholder="Mínimo 6 caracteres"
-                  className="border-gray-300 bg-white text-gray-900"
-                />
-              </div>
-
-              <Button
-                className="w-full bg-teal-600 text-white hover:bg-teal-700"
-                type="submit"
-                disabled={creatingDoctor}
-              >
-                {creatingDoctor ? 'Creando usuario...' : 'Crear médico'}
-              </Button>
-            </form>
-
-            {doctorMessage ? (
-              <div className="mt-4 rounded-md border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-700">
-                {doctorMessage}
-              </div>
-            ) : null}
-
-            {doctorError ? (
-              <div className="mt-4 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-                {doctorError}
-              </div>
-            ) : null}
-          </CardContent>
-        </Card>
-
-        <Card className="mx-auto mt-8 w-full border border-gray-200 bg-white shadow-lg">
-          <CardHeader className="border-b border-gray-100 bg-gray-50/50">
-            <div className="flex items-start gap-3">
-              <div className="rounded-lg bg-blue-100 p-2">
-                <UsersRound className="h-5 w-5 text-blue-600" />
+            <div className="flex items-center gap-3">
+              <div className="rounded-lg bg-teal-100 p-2">
+                <ShieldCheck className="h-5 w-5 text-teal-600" />
               </div>
               <div>
-                <CardTitle className="text-xl text-gray-900">Alta de pacientes con asignación de médico</CardTitle>
+                <CardTitle className="text-xl text-gray-900">Selecciona una gestión</CardTitle>
                 <CardDescription className="text-gray-500">
-                  Crea un paciente y vincúlalo al ownerId de un médico existente.
+                  Elige si quieres dar de alta un médico o registrar un nuevo paciente.
                 </CardDescription>
               </div>
             </div>
           </CardHeader>
 
-          <CardContent className="p-6">
-            <div className="grid gap-6 lg:grid-cols-2">
-              <form className="space-y-4" onSubmit={onPatientSubmit}>
-                <div className="space-y-2">
-                  <Label htmlFor="patient-dni" className="text-gray-700">DNI</Label>
-                  <Input
-                    id="patient-dni"
-                    required
-                    value={dni}
-                    onChange={(event) => setDni(event.target.value)}
-                    placeholder="12345678"
-                    className="border-gray-300 bg-white text-gray-900"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="patient-name" className="text-gray-700">Nombre completo</Label>
-                  <Input
-                    id="patient-name"
-                    required
-                    value={name}
-                    onChange={(event) => setName(event.target.value)}
-                    placeholder="Nombre del paciente"
-                    className="border-gray-300 bg-white text-gray-900"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="patient-email" className="text-gray-700">Correo electrónico</Label>
-                  <Input
-                    id="patient-email"
-                    type="email"
-                    value={patientEmail}
-                    onChange={(event) => setPatientEmail(event.target.value)}
-                    placeholder="paciente@correo.com"
-                    className="border-gray-300 bg-white text-gray-900"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="patient-phone" className="text-gray-700">Teléfono</Label>
-                  <Input
-                    id="patient-phone"
-                    value={phone}
-                    onChange={(event) => setPhone(event.target.value)}
-                    placeholder="600123123"
-                    className="border-gray-300 bg-white text-gray-900"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="patient-dob" className="text-gray-700">Fecha de nacimiento</Label>
-                  <Input
-                    id="patient-dob"
-                    type="date"
-                    value={dateOfBirth}
-                    onChange={(event) => setDateOfBirth(event.target.value)}
-                    className="border-gray-300 bg-white text-gray-900"
-                  />
-                </div>
-
-                <div className="rounded-md border border-blue-100 bg-blue-50 px-3 py-2 text-sm text-blue-700">
-                  {selectedDoctor ? (
-                    <div className="flex items-center gap-2">
-                      <UserCheck className="h-4 w-4" />
-                      <span>Médico asignado:</span>
-                      <Badge className="bg-white text-blue-700 hover:bg-white">{selectedDoctor.email}</Badge>
-                    </div>
-                  ) : (
-                    <span>Selecciona un médico en la columna derecha para establecer el ownerId.</span>
-                  )}
-                </div>
-
-                <Button
-                  className="w-full bg-teal-600 text-white hover:bg-teal-700"
-                  type="submit"
-                  disabled={creatingPatient}
+          <CardContent className="grid gap-6 p-6 md:grid-cols-2">
+            {actions.map((action) => {
+              const Icon = action.icon;
+              return (
+                <Link
+                  key={action.href}
+                  href={action.href}
+                  className={`group relative overflow-hidden rounded-xl border border-gray-200 bg-white p-6 shadow-sm ring-2 ring-transparent transition hover:-translate-y-0.5 hover:shadow-md ${action.ring}`}
                 >
-                  {creatingPatient ? 'Creando paciente...' : 'Crear paciente y vincular médico'}
-                </Button>
-
-                {patientMessage ? (
-                  <div className="rounded-md border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-700">
-                    {patientMessage}
+                  <div className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${action.accent}`} />
+                  <div className="flex items-start justify-between">
+                    <div className="rounded-lg bg-gray-100 p-2">
+                      <Icon className="h-5 w-5 text-gray-700" />
+                    </div>
+                    <ArrowRight className="h-5 w-5 text-gray-400 transition group-hover:translate-x-1 group-hover:text-gray-700" />
                   </div>
-                ) : null}
-
-                {patientError ? (
-                  <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-                    {patientError}
-                  </div>
-                ) : null}
-              </form>
-
-              <div className="rounded-lg border border-gray-200 bg-white p-4">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                  <Input
-                    value={doctorSearch}
-                    onChange={(event) => setDoctorSearch(event.target.value)}
-                    placeholder="Buscar médico por email o id..."
-                    className="pl-9 border-gray-300 bg-white text-gray-900 placeholder:text-gray-400 focus:border-teal-500 focus:ring-teal-500"
-                  />
-                </div>
-
-                <div className="mt-4 max-h-[420px] space-y-2 overflow-y-auto pr-1">
-                  {loadingDoctors ? (
-                    <p className="text-sm text-gray-500">Buscando médicos...</p>
-                  ) : doctors.length === 0 ? (
-                    <p className="text-sm text-gray-500">
-                      {hasDoctorSearch
-                        ? 'No hay resultados para esa búsqueda.'
-                        : 'No se encontraron médicos disponibles.'}
-                    </p>
-                  ) : (
-                    doctors.map((doctor) => {
-                      const isSelected = selectedDoctor?.id === doctor.id;
-                      return (
-                        <button
-                          key={doctor.id}
-                          type="button"
-                          onClick={() => {
-                            setSelectedDoctor(doctor);
-                            setPatientError(null);
-                          }}
-                          className={`w-full rounded-md border p-3 text-left transition ${
-                            isSelected
-                              ? 'border-teal-500 bg-teal-50'
-                              : 'border-gray-200 bg-white hover:border-teal-300 hover:bg-teal-50/40'
-                          }`}
-                        >
-                          <p className="font-medium text-gray-900">{doctor.email}</p>
-                          <p className="mt-1 text-xs text-gray-500">ID: {doctor.id}</p>
-                        </button>
-                      );
-                    })
-                  )}
-                </div>
-              </div>
-            </div>
+                  <h3 className="mt-4 text-lg font-semibold text-gray-900">{action.title}</h3>
+                  <p className="mt-2 text-sm text-gray-600">{action.description}</p>
+                </Link>
+              );
+            })}
           </CardContent>
         </Card>
       </div>

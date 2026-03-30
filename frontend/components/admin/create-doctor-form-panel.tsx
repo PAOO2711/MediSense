@@ -61,10 +61,10 @@ export function CreateDoctorFormPanel() {
               </CardDescription>
             </div>
           </div>
-          <Button className="bg-teal-600 text-white hover:bg-teal-700" disabled>
+          {/* <Button className="bg-teal-600 text-white hover:bg-teal-700" disabled>
             <UserPlus className="mr-2 h-4 w-4" />
             Alta de médico
-          </Button>
+          </Button> */}
         </div>
       </CardHeader>
 
