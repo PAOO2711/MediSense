@@ -277,7 +277,7 @@ export default function PatientDetailPage({ params }: { params: Promise<{ dni: s
                   </Button>
                 </div>
               ) : (
-                <div className="space-y-4">
+                <div className="consultations-scroll max-h-[30rem] space-y-4 overflow-y-auto pr-2">
                   {consultations.map((consultation) => (
                     <div 
                       key={consultation.id}
