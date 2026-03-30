@@ -4,6 +4,7 @@ import {
   createPatientHistory,
   updatePatientHistoryStatus,
 } from "@/lib/db/queries/index";
+import { ForbiddenError, requireDoctor, UnauthorizedError } from '@/lib/auth/require-user';
 
 // GET /api/patients/[dni]/history
 export async function GET(
@@ -11,6 +12,7 @@ export async function GET(
   { params }: { params: Promise<{ dni: string }> }
 ) {
   try {
+    await requireDoctor();
     const { dni } = await params;
     const patientDNI = parseInt(dni);
 
@@ -28,6 +30,12 @@ export async function GET(
     const history = await getPatientHistoryByDNI(patientDNI, activeOnly);
     return NextResponse.json(history);
   } catch (error) {
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    if (error instanceof ForbiddenError) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
     console.error("Error fetching patient history:", error);
     return NextResponse.json(
       { error: "Error al obtener el historial del paciente" },
@@ -42,6 +50,7 @@ export async function POST(
   { params }: { params: Promise<{ dni: string }> }
 ) {
   try {
+    await requireDoctor();
     const { dni } = await params;
     const patientDNI = parseInt(dni);
 
@@ -73,6 +82,12 @@ export async function POST(
 
     return NextResponse.json(history, { status: 201 });
   } catch (error) {
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    if (error instanceof ForbiddenError) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
     console.error("Error creating patient history:", error);
     return NextResponse.json(
       { error: "Error al crear el antecedente" },
@@ -84,6 +99,7 @@ export async function POST(
 // PUT /api/patients/[dni]/history
 export async function PUT(request: NextRequest) {
   try {
+    await requireDoctor();
     const body = await request.json();
     const { historyId, status, resolvedInConsultationId } = body;
 
@@ -109,6 +125,12 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json(updated);
   } catch (error) {
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    if (error instanceof ForbiddenError) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
     console.error("Error updating patient history status:", error);
     return NextResponse.json(
       { error: "Error al actualizar el estado del antecedente" },

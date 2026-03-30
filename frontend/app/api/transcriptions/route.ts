@@ -3,10 +3,12 @@ import { createTranscription, getTranscriptionsByConsultation } from '@/lib/db/q
 import { db } from '@/lib/db';
 import { transcriptions } from '@/lib/db/schema';
 import { desc } from 'drizzle-orm';
+import { ForbiddenError, requireDoctor, UnauthorizedError } from '@/lib/auth/require-user';
 
 // GET /api/transcriptions - Obtener todas las transcripciones
 export async function GET() {
   try {
+    await requireDoctor();
     const allTranscriptions = await db
       .select()
       .from(transcriptions)
@@ -14,6 +16,12 @@ export async function GET() {
 
     return NextResponse.json(allTranscriptions);
   } catch (error) {
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    if (error instanceof ForbiddenError) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
     console.error('Error fetching transcriptions:', error);
     return NextResponse.json(
       { error: 'Error al obtener transcripciones' },
@@ -25,6 +33,7 @@ export async function GET() {
 // POST /api/transcriptions - Crear una nueva transcripción
 export async function POST(request: NextRequest) {
   try {
+    await requireDoctor();
     const body = await request.json();
     
     const { consultationId, fullText, segments, duration, language, languageProbability, filename } = body;
@@ -48,6 +57,12 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(transcription, { status: 201 });
   } catch (error) {
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    if (error instanceof ForbiddenError) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
     console.error('Error creating transcription:', error);
     return NextResponse.json(
       { error: 'Error al crear transcripción' },

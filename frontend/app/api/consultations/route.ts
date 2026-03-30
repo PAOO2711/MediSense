@@ -3,10 +3,12 @@ import { createConsultation } from '@/lib/db/queries';
 import { db } from '@/lib/db';
 import { consultations } from '@/lib/db/schema';
 import { desc } from 'drizzle-orm';
+import { ForbiddenError, requireDoctor, UnauthorizedError } from '@/lib/auth/require-user';
 
 // GET /api/consultations - Obtener todas las consultas
 export async function GET() {
   try {
+    await requireDoctor();
     const allConsultations = await db
       .select()
       .from(consultations)
@@ -14,6 +16,12 @@ export async function GET() {
 
     return NextResponse.json(allConsultations);
   } catch (error) {
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    if (error instanceof ForbiddenError) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
     console.error('Error fetching consultations:', error);
     return NextResponse.json(
       { error: 'Error al obtener consultas' },
@@ -25,6 +33,7 @@ export async function GET() {
 // POST /api/consultations - Crear una nueva consulta
 export async function POST(request: NextRequest) {
   try {
+    await requireDoctor();
     const body = await request.json();
     
     const { patientId, title, motivoConsulta, anamnesis, pruebas, diagnostico, recomendaciones, status } = body;
@@ -49,6 +58,12 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(consultation, { status: 201 });
   } catch (error) {
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    if (error instanceof ForbiddenError) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
     console.error('Error creating consultation:', error);
     return NextResponse.json(
       { error: 'Error al crear consulta' },

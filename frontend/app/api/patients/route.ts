@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPatients, getPatientsWithFilters } from '@/lib/db/queries';
-import { requireUser, UnauthorizedError } from '@/lib/auth/require-user';
+import { ForbiddenError, requireDoctor, UnauthorizedError } from '@/lib/auth/require-user';
 
 // GET /api/patients - Obtener todos los pacientes con filtros opcionales
 export async function GET(request: NextRequest) {
   try {
-    const user = await requireUser();
+    const user = await requireDoctor();
     const searchParams = request.nextUrl.searchParams;
     
     const search = searchParams.get('search') || '';
@@ -33,6 +33,9 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     if (error instanceof UnauthorizedError) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    if (error instanceof ForbiddenError) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
     console.error('Error fetching patients:', error);
     return NextResponse.json(

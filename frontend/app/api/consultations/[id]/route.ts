@@ -3,6 +3,7 @@ import { getConsultationWithDetails } from '@/lib/db/queries';
 import { db } from '@/lib/db';
 import { consultations } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
+import { ForbiddenError, requireDoctor, UnauthorizedError } from '@/lib/auth/require-user';
 
 // GET /api/consultations/[id] - Obtener una consulta con todos sus detalles
 export async function GET(
@@ -10,6 +11,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    await requireDoctor();
     const { id } = await params;
     const consultation = await getConsultationWithDetails(id);
 
@@ -22,6 +24,12 @@ export async function GET(
 
     return NextResponse.json(consultation);
   } catch (error) {
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    if (error instanceof ForbiddenError) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
     console.error('Error fetching consultation:', error);
     return NextResponse.json(
       { error: 'Error al obtener consulta' },
@@ -36,6 +44,7 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    await requireDoctor();
     const { id } = await params;
     const body = await request.json();
     
@@ -64,6 +73,12 @@ export async function PUT(
 
     return NextResponse.json(updated);
   } catch (error) {
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    if (error instanceof ForbiddenError) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
     console.error('Error updating consultation:', error);
     return NextResponse.json(
       { error: 'Error al actualizar consulta' },
@@ -78,6 +93,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    await requireDoctor();
     const { id } = await params;
     
     const [deleted] = await db
@@ -94,6 +110,12 @@ export async function DELETE(
 
     return NextResponse.json({ message: 'Consulta eliminada correctamente' });
   } catch (error) {
+    if (error instanceof UnauthorizedError) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    if (error instanceof ForbiddenError) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
     console.error('Error deleting consultation:', error);
     return NextResponse.json(
       { error: 'Error al eliminar consulta' },

@@ -3,7 +3,7 @@ import { getPatientByDNI } from '@/lib/db/queries';
 import { db } from '@/lib/db';
 import { patients } from '@/lib/db/schema';
 import { and, eq } from 'drizzle-orm';
-import { requireUser, UnauthorizedError } from '@/lib/auth/require-user';
+import { ForbiddenError, requireDoctor, UnauthorizedError } from '@/lib/auth/require-user';
 
 // GET /api/patients/[dni] - Obtener un paciente por DNI
 export async function GET(
@@ -11,7 +11,7 @@ export async function GET(
   { params }: { params: Promise<{ dni: string }> }
 ) {
   try {
-    const user = await requireUser();
+    const user = await requireDoctor();
     const { dni } = await params;
     const patient = await getPatientByDNI(parseInt(dni), user.id);
 
@@ -27,6 +27,9 @@ export async function GET(
     if (error instanceof UnauthorizedError) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+    if (error instanceof ForbiddenError) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
     console.error('Error fetching patient:', error);
     return NextResponse.json(
       { error: 'Error al obtener paciente' },
@@ -41,7 +44,7 @@ export async function PUT(
   { params }: { params: Promise<{ dni: string }> }
 ) {
   try {
-    const user = await requireUser();
+    const user = await requireDoctor();
     const { dni } = await params;
     const body = await request.json();
     
@@ -71,6 +74,9 @@ export async function PUT(
     if (error instanceof UnauthorizedError) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+    if (error instanceof ForbiddenError) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
     console.error('Error updating patient:', error);
     return NextResponse.json(
       { error: 'Error al actualizar paciente' },
@@ -85,7 +91,7 @@ export async function DELETE(
   { params }: { params: Promise<{ dni: string }> }
 ) {
   try {
-    const user = await requireUser();
+    const user = await requireDoctor();
     const { dni } = await params;
     
     const [deleted] = await db
@@ -104,6 +110,9 @@ export async function DELETE(
   } catch (error) {
     if (error instanceof UnauthorizedError) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    if (error instanceof ForbiddenError) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
     console.error('Error deleting patient:', error);
     return NextResponse.json(

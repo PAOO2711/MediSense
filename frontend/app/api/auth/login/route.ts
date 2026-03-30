@@ -22,11 +22,16 @@ export async function POST(request: NextRequest) {
     });
 
     if (error) {
+      const normalizedMessage = error.message.toLowerCase();
+      const readableError =
+        error.message === 'Invalid login credentials'
+          ? 'Credenciales inválidas'
+          : normalizedMessage.includes('email not confirmed')
+            ? 'Este usuario aún no está confirmado. Contacta con el administrador.'
+            : error.message;
+
       return NextResponse.json(
-        { error: error.message === 'Invalid login credentials'
-            ? 'Credenciales inválidas'
-            : error.message
-        },
+        { error: readableError },
         { status: 401 }
       );
     }
