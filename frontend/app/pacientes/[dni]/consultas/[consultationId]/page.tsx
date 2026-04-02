@@ -150,6 +150,14 @@ export default function ConsultaDetailPage({
         <div className="container mx-auto px-6 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
+              <Button 
+                variant="ghost" 
+                size="icon"
+                className="text-white hover:bg-white/20"
+                onClick={() => router.push(`/pacientes/${patient?.dni}`)}
+              >
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
               <div>
                 <a href={`/pacientes/${patient?.dni}`}>
                 <h1 className="text-2xl font-bold">Detalle de Consulta</h1>

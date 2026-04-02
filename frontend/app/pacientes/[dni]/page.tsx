@@ -21,6 +21,7 @@ import {
   Heart
 } from 'lucide-react';
 import type { Patient, Consultation } from '@/types/consultation';
+import { logout } from '@/app/actions/auth';
 
 export default function PatientDetailPage({ params }: { params: Promise<{ dni: string }> }) {
   const resolvedParams = use(params);
@@ -100,6 +101,17 @@ export default function PatientDetailPage({ params }: { params: Promise<{ dni: s
     }
   };
 
+  const handleLogout = async () => {
+      try {
+        const response = await logout();
+        if (response.success) {
+          router.push('/login');
+        }
+      } catch (error) {
+        console.error('Error al cerrar sesión:', error);
+      }
+    };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
@@ -149,6 +161,14 @@ export default function PatientDetailPage({ params }: { params: Promise<{ dni: s
               <Activity className="h-5 w-5 text-green-300 animate-pulse" />
               <span className="text-sm text-blue-100">Sistema activo</span>
             </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleLogout}
+              className="ml-6 border-white text-white hover:bg-white hover:text-teal-600"
+            >
+              Cerrar sesión
+            </Button>
           </div>
         </div>
       </div>
