@@ -10,8 +10,21 @@ import { Search, UserCheck, UsersRound } from 'lucide-react';
 
 type Doctor = {
   id: string;
+  name: string;
+  surname: string;
   email: string;
 };
+
+type DoctorsMeta = {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+};
+
+const DOCTORS_PAGE_SIZE = 5;
 
 export function CreatePatientFormPanel() {
   const [dni, setDni] = useState('');
@@ -21,6 +34,15 @@ export function CreatePatientFormPanel() {
   const [dateOfBirth, setDateOfBirth] = useState('');
   const [doctorSearch, setDoctorSearch] = useState('');
   const [doctors, setDoctors] = useState<Doctor[]>([]);
+  const [doctorsMeta, setDoctorsMeta] = useState<DoctorsMeta>({
+    page: 1,
+    limit: DOCTORS_PAGE_SIZE,
+    total: 0,
+    totalPages: 0,
+    hasNextPage: false,
+    hasPreviousPage: false,
+  });
+  const [doctorPage, setDoctorPage] = useState(1);
   const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
   const [loadingDoctors, setLoadingDoctors] = useState(false);
   const [creatingPatient, setCreatingPatient] = useState(false);
@@ -28,6 +50,16 @@ export function CreatePatientFormPanel() {
   const [patientError, setPatientError] = useState<string | null>(null);
 
   const hasDoctorSearch = useMemo(() => doctorSearch.trim().length > 0, [doctorSearch]);
+
+  const getDoctorDisplayName = (doctor: Doctor) => {
+    const fullName = `${doctor.name} ${doctor.surname}`.trim();
+    return fullName.length > 0 ? fullName : 'Médico sin nombre';
+  };
+
+  const handleDoctorSearchChange = (value: string) => {
+    setDoctorSearch(value);
+    setDoctorPage(1);
+  };
 
   useEffect(() => {
     const controller = new AbortController();
@@ -38,6 +70,8 @@ export function CreatePatientFormPanel() {
         if (doctorSearch.trim()) {
           params.set('q', doctorSearch.trim());
         }
+        params.set('page', String(doctorPage));
+        params.set('limit', String(DOCTORS_PAGE_SIZE));
         const response = await fetch(`/api/admin/doctors?${params.toString()}`, {
           method: 'GET',
           signal: controller.signal,
@@ -51,18 +85,29 @@ export function CreatePatientFormPanel() {
 
         const nextDoctors: Doctor[] = Array.isArray(result.data) ? result.data : [];
         setDoctors(nextDoctors);
-
-        if (selectedDoctor) {
-          const stillExists = nextDoctors.find((doctor) => doctor.id === selectedDoctor.id);
-          if (!stillExists) {
-            setSelectedDoctor(null);
+        setDoctorsMeta(
+          result.meta ?? {
+            page: doctorPage,
+            limit: DOCTORS_PAGE_SIZE,
+            total: nextDoctors.length,
+            totalPages: nextDoctors.length > 0 ? 1 : 0,
+            hasNextPage: false,
+            hasPreviousPage: doctorPage > 1,
           }
-        }
+        );
       } catch (error) {
         if (error instanceof DOMException && error.name === 'AbortError') {
           return;
         }
         setDoctors([]);
+        setDoctorsMeta({
+          page: doctorPage,
+          limit: DOCTORS_PAGE_SIZE,
+          total: 0,
+          totalPages: 0,
+          hasNextPage: false,
+          hasPreviousPage: doctorPage > 1,
+        });
       } finally {
         setLoadingDoctors(false);
       }
@@ -72,7 +117,7 @@ export function CreatePatientFormPanel() {
       controller.abort();
       clearTimeout(timer);
     };
-  }, [doctorSearch, selectedDoctor]);
+  }, [doctorSearch, doctorPage]);
 
   async function onPatientSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -203,7 +248,7 @@ export function CreatePatientFormPanel() {
                 <div className="flex items-center gap-2">
                   <UserCheck className="h-4 w-4" />
                   <span>Médico asignado:</span>
-                  <Badge className="bg-white text-blue-700 hover:bg-white">{selectedDoctor.email}</Badge>
+                  <Badge className="bg-white text-blue-700 hover:bg-white">{getDoctorDisplayName(selectedDoctor)}</Badge>
                 </div>
               ) : (
                 <span>Selecciona un médico en la columna derecha para asignárselo a un paciente.</span>
@@ -236,10 +281,41 @@ export function CreatePatientFormPanel() {
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
               <Input
                 value={doctorSearch}
-                onChange={(event) => setDoctorSearch(event.target.value)}
-                placeholder="Buscar médico por email o id..."
+                onChange={(event) => handleDoctorSearchChange(event.target.value)}
+                placeholder="Buscar médico por nombre, apellidos, email o id..."
                 className="pl-9 border-gray-300 bg-white text-gray-900 placeholder:text-gray-400 focus:border-teal-500 focus:ring-teal-500"
               />
+            </div>
+
+            <div className="mt-3 flex items-center justify-between gap-3 text-sm text-gray-600">
+              <span>
+                {doctorsMeta.total > 0
+                  ? `Mostrando ${doctors.length} de ${doctorsMeta.total}`
+                  : 'Sin resultados'}
+              </span>
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="border-gray-300 bg-white text-gray-700 hover:border-teal-300 hover:bg-teal-50 hover:text-teal-700"
+                  disabled={loadingDoctors || !doctorsMeta.hasPreviousPage}
+                  onClick={() => setDoctorPage((currentPage) => Math.max(1, currentPage - 1))}
+                >
+                  Anterior
+                </Button>
+                <span className="min-w-20 text-center text-xs uppercase tracking-wide text-gray-400">
+                  Página {doctorsMeta.page} de {doctorsMeta.totalPages || 1}
+                </span>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="border-gray-300 bg-white text-gray-700 hover:border-teal-300 hover:bg-teal-50 hover:text-teal-700"
+                  disabled={loadingDoctors || !doctorsMeta.hasNextPage}
+                  onClick={() => setDoctorPage((currentPage) => currentPage + 1)}
+                >
+                  Siguiente
+                </Button>
+              </div>
             </div>
 
             <div className="mt-4 max-h-[420px] space-y-2 overflow-y-auto pr-1">
@@ -268,8 +344,8 @@ export function CreatePatientFormPanel() {
                           : 'border-gray-200 bg-white hover:border-teal-300 hover:bg-teal-50/40'
                       }`}
                     >
-                      <p className="font-medium text-gray-900">{doctor.email}</p>
-                      <p className="mt-1 text-xs text-gray-500">ID: {doctor.id}</p>
+                      <p className="font-medium text-gray-900">{getDoctorDisplayName(doctor)}</p>
+                      <p className="mt-1 text-xs text-gray-500">{doctor.email || 'Sin email'}</p>
                     </button>
                   );
                 })

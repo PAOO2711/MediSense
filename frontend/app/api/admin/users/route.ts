@@ -10,18 +10,35 @@ export async function POST(request: NextRequest) {
   try {
     await requireAdmin();
 
-    const { email, password } = await request.json();
+    const { dni, name, surname, email, phone, dateOfBirth, password } = await request.json();
 
-    if (!email || !password) {
+    const normalizedDni = typeof dni === 'string' ? dni.trim().toUpperCase() : '';
+    const normalizedName = typeof name === 'string' ? name.trim() : '';
+    const normalizedSurname = typeof surname === 'string' ? surname.trim() : '';
+    const normalizedEmail = typeof email === 'string' ? email.trim().toLowerCase() : '';
+    const normalizedPhone = typeof phone === 'string' && phone.trim().length > 0 ? phone.trim() : null;
+    const normalizedDateOfBirth =
+      typeof dateOfBirth === 'string' && dateOfBirth.trim().length > 0
+        ? dateOfBirth.trim()
+        : null;
+
+    if (!normalizedDni || !normalizedName || !normalizedSurname || !normalizedEmail || !password) {
       return NextResponse.json(
-        { error: 'Email y contraseña son obligatorios' },
+        { error: 'DNI, nombre, apellidos, email y contraseña son obligatorios' },
+        { status: 400 }
+      );
+    }
+
+    if (normalizedDateOfBirth && Number.isNaN(Date.parse(normalizedDateOfBirth))) {
+      return NextResponse.json(
+        { error: 'La fecha de nacimiento no es válida' },
         { status: 400 }
       );
     }
 
     const supabase = createAdminClient();
     const { data, error } = await supabase.auth.admin.createUser({
-      email,
+      email: normalizedEmail,
       password,
       email_confirm: true,
     });
@@ -45,9 +62,27 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: roleError.message }, { status: 400 });
     }
 
+    const { error: doctorError } = await supabase.from('doctors').insert({
+      dni: normalizedDni,
+      id: data.user.id,
+      name: normalizedName,
+      surname: normalizedSurname,
+      email: normalizedEmail,
+      phone: normalizedPhone,
+      date_of_birth: normalizedDateOfBirth,
+    });
+
+    if (doctorError) {
+      await supabase.from('roles').delete().eq('id', data.user.id);
+      await supabase.auth.admin.deleteUser(data.user.id);
+      return NextResponse.json({ error: doctorError.message }, { status: 400 });
+    }
+
     return NextResponse.json(
       {
         id: data.user?.id,
+        name: normalizedName,
+        surname: normalizedSurname,
         email: data.user?.email,
         role: 'user',
       },

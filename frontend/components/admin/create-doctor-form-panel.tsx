@@ -8,7 +8,12 @@ import { Label } from '@/components/ui/label';
 import { ShieldCheck, UserPlus } from 'lucide-react';
 
 export function CreateDoctorFormPanel() {
+  const [doctorDni, setDoctorDni] = useState('');
+  const [doctorName, setDoctorName] = useState('');
+  const [doctorSurname, setDoctorSurname] = useState('');
   const [doctorEmail, setDoctorEmail] = useState('');
+  const [doctorPhone, setDoctorPhone] = useState('');
+  const [doctorDateOfBirth, setDoctorDateOfBirth] = useState('');
   const [doctorPassword, setDoctorPassword] = useState('');
   const [creatingDoctor, setCreatingDoctor] = useState(false);
   const [doctorMessage, setDoctorMessage] = useState<string | null>(null);
@@ -26,18 +31,31 @@ export function CreateDoctorFormPanel() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email: doctorEmail, password: doctorPassword }),
+        body: JSON.stringify({
+          dni: doctorDni,
+          name: doctorName,
+          surname: doctorSurname,
+          email: doctorEmail,
+          phone: doctorPhone,
+          dateOfBirth: doctorDateOfBirth || null,
+          password: doctorPassword,
+        }),
       });
 
       const result = await response.json();
 
       if (!response.ok) {
-        setDoctorError(result.error ?? 'No se pudo crear el usuario');
+        setDoctorError('No se pudo crear el usuario, revise los datos e intente de nuevo');
         return;
       }
 
-      setDoctorMessage(`Médico creado: ${result.email}`);
+      setDoctorMessage(`Médico creado: ${result.name} ${result.surname} (${result.email})`);
+      setDoctorDni('');
+      setDoctorName('');
+      setDoctorSurname('');
       setDoctorEmail('');
+      setDoctorPhone('');
+      setDoctorDateOfBirth('');
       setDoctorPassword('');
     } catch {
       setDoctorError('Error de red al crear el usuario');
@@ -70,6 +88,47 @@ export function CreateDoctorFormPanel() {
 
       <CardContent className="p-6">
         <form className="space-y-5" onSubmit={onDoctorSubmit}>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="name" className="text-gray-700">Nombre</Label>
+              <Input
+                id="name"
+                type="text"
+                required
+                value={doctorName}
+                onChange={(event) => setDoctorName(event.target.value)}
+                placeholder="María"
+                className="border-gray-300 bg-white text-gray-900"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="surname" className="text-gray-700">Apellidos</Label>
+              <Input
+                id="surname"
+                type="text"
+                required
+                value={doctorSurname}
+                onChange={(event) => setDoctorSurname(event.target.value)}
+                placeholder="García López"
+                className="border-gray-300 bg-white text-gray-900"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="dni" className="text-gray-700">DNI</Label>
+            <Input
+              id="dni"
+              type="text"
+              required
+              value={doctorDni}
+              onChange={(event) => setDoctorDni(event.target.value)}
+              placeholder="12345678Z"
+              className="border-gray-300 bg-white text-gray-900"
+            />
+          </div>
+
           <div className="space-y-2">
             <Label htmlFor="email" className="text-gray-700">Email del médico</Label>
             <Input
@@ -81,6 +140,31 @@ export function CreateDoctorFormPanel() {
               placeholder="medico@clinic.com"
               className="border-gray-300 bg-white text-gray-900"
             />
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="phone" className="text-gray-700">Teléfono</Label>
+              <Input
+                id="phone"
+                type="tel"
+                value={doctorPhone}
+                onChange={(event) => setDoctorPhone(event.target.value)}
+                placeholder="600123123"
+                className="border-gray-300 bg-white text-gray-900"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="dateOfBirth" className="text-gray-700">Fecha de nacimiento</Label>
+              <Input
+                id="dateOfBirth"
+                type="date"
+                value={doctorDateOfBirth}
+                onChange={(event) => setDoctorDateOfBirth(event.target.value)}
+                className="border-gray-300 bg-white text-gray-900"
+              />
+            </div>
           </div>
 
           <div className="space-y-2">

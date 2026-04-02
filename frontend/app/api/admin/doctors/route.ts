@@ -8,79 +8,92 @@ import {
 
 type DoctorResult = {
   id: string;
+  name: string;
+  surname: string;
   email: string;
 };
+
+const DEFAULT_PAGE = 1;
+const DEFAULT_LIMIT = 5;
+const MAX_LIMIT = 25;
 
 export async function GET(request: NextRequest) {
   try {
     await requireAdmin();
 
     const search = request.nextUrl.searchParams.get('q')?.trim().toLowerCase() ?? '';
+    const pageParam = Number.parseInt(request.nextUrl.searchParams.get('page') ?? '', 10);
+    const limitParam = Number.parseInt(request.nextUrl.searchParams.get('limit') ?? '', 10);
+    const page = Number.isFinite(pageParam) && pageParam > 0 ? pageParam : DEFAULT_PAGE;
+    const limit =
+      Number.isFinite(limitParam) && limitParam > 0
+        ? Math.min(limitParam, MAX_LIMIT)
+        : DEFAULT_LIMIT;
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
+
     const supabase = createAdminClient();
 
-    const { data: doctorRoles, error: rolesError } = await supabase
-      .from('roles')
-      .select('id')
-      .eq('role', 'user');
+    let query = supabase
+      .from('doctors')
+      .select('id, name, surname, email', { count: 'exact' })
+      .order('name', { ascending: true })
+      .order('surname', { ascending: true })
+      .range(from, to);
 
-    if (rolesError) {
-      return NextResponse.json({ error: rolesError.message }, { status: 400 });
+    if (search.length > 0) {
+      query = query.or(
+        `name.ilike.%${search}%,surname.ilike.%${search}%,email.ilike.%${search}%`
+      );
     }
 
-    const doctorIds = new Set((doctorRoles ?? []).map((row) => row.id));
-    if (doctorIds.size === 0) {
-      return NextResponse.json({ data: [] satisfies DoctorResult[] });
+    const { data: doctorProfiles, error: doctorsError, count } = await query;
+
+    if (doctorsError) {
+      return NextResponse.json({ error: doctorsError.message }, { status: 400 });
     }
 
-    const doctors: DoctorResult[] = [];
-    const perPage = 100;
-    let page = 1;
+    const doctors: DoctorResult[] = (doctorProfiles ?? [])
+      .map((doctor) => {
+        const name = typeof doctor.name === 'string' ? doctor.name.trim() : '';
+        const surname = typeof doctor.surname === 'string' ? doctor.surname.trim() : '';
+        const email = typeof doctor.email === 'string' ? doctor.email.trim() : '';
 
-    while (true) {
-      const { data, error } = await supabase.auth.admin.listUsers({ page, perPage });
-      if (error) {
-        return NextResponse.json({ error: error.message }, { status: 400 });
-      }
-
-      const users = data.users ?? [];
-      if (users.length === 0) {
-        break;
-      }
-
-      for (const user of users) {
-        if (!doctorIds.has(user.id)) {
-          continue;
+        return {
+          id: doctor.id,
+          name,
+          surname,
+          email,
+        };
+      })
+      .filter((doctor) => {
+        if (search.length === 0) {
+          return true;
         }
 
-        const email = user.email?.trim();
-        if (!email) {
-          continue;
-        }
+        const fullName = `${doctor.name} ${doctor.surname}`.trim().toLowerCase();
+        return (
+          fullName.includes(search) ||
+          doctor.name.toLowerCase().includes(search) ||
+          doctor.surname.toLowerCase().includes(search) ||
+          doctor.email.toLowerCase().includes(search) ||
+          doctor.id.toLowerCase().includes(search)
+        );
+      });
 
-        const matchSearch =
-          search.length === 0 ||
-          email.toLowerCase().includes(search) ||
-          user.id.toLowerCase().includes(search);
-
-        if (matchSearch) {
-          doctors.push({
-            id: user.id,
-            email,
-          });
-        }
-      }
-
-      const lastPage = data.lastPage ?? page;
-      if (page >= lastPage || doctors.length >= 60) {
-        break;
-      }
-      page += 1;
-    }
-
-    doctors.sort((a, b) => a.email.localeCompare(b.email));
+    const total = count ?? doctors.length;
+    const totalPages = total === 0 ? 0 : Math.ceil(total / limit);
 
     return NextResponse.json({
-      data: doctors.slice(0, 60),
+      data: doctors,
+      meta: {
+        page,
+        limit,
+        total,
+        totalPages,
+        hasNextPage: page < totalPages,
+        hasPreviousPage: page > 1,
+      },
     });
   } catch (error) {
     if (error instanceof UnauthorizedError) {
