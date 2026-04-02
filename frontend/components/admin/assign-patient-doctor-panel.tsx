@@ -322,7 +322,7 @@ export function AssignPatientDoctorPanel() {
               </div>
             </div>
 
-            <div className="mt-4 max-h-[420px] space-y-2 overflow-y-auto pr-1">
+            <div className="mt-4 h-[420px] space-y-2 overflow-y-auto pr-1">
               {loadingPatients ? (
                 <p className="text-sm text-gray-500">Buscando pacientes...</p>
               ) : patients.length === 0 ? (
@@ -348,7 +348,6 @@ export function AssignPatientDoctorPanel() {
                     >
                       <p className="font-medium text-gray-900">{getPatientDisplayName(patient)}</p>
                       <p className="mt-1 text-xs text-gray-500">DNI: {patient.dni}</p>
-                      {patient.email ? <p className="mt-1 text-xs text-gray-500">{patient.email}</p> : null}
                     </button>
                   );
                 })
@@ -400,7 +399,7 @@ export function AssignPatientDoctorPanel() {
               </div>
             </div>
 
-            <div className="mt-4 max-h-[420px] space-y-2 overflow-y-auto pr-1">
+            <div className="mt-4 h-[420px] space-y-2 overflow-y-auto pr-1">
               {loadingDoctors ? (
                 <p className="text-sm text-gray-500">Buscando médicos...</p>
               ) : doctors.length === 0 ? (
