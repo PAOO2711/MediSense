@@ -44,7 +44,7 @@ class EmbeddingsService:
             
             # Agregar patient_id solo si se proporciona
             if patient_id is not None:
-                rpc_params["patient_id"] = patient_id
+                rpc_params["p_patient_id"] = patient_id
             
             # Llamar a la función RPC de Supabase
             res = self.supabase.rpc("match_documents", rpc_params).execute()
