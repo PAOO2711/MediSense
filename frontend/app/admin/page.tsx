@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowRight, ShieldCheck, UserPlus, UsersRound } from 'lucide-react';
+import { ArrowRight, ShieldCheck, UserPlus, UsersRound, UserCog } from 'lucide-react';
 import { AdminHeader } from '@/components/admin/admin-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -19,6 +19,14 @@ const actions = [
     icon: UsersRound,
     accent: 'from-blue-500 to-cyan-500',
     ring: 'group-hover:ring-blue-300',
+  },
+  {
+    title: 'Asignar médico a paciente',
+    description: 'Reasigna un paciente existente a otro médico.',
+    href: '/admin/assignments',
+    icon: UserCog,
+    accent: 'from-violet-500 to-fuchsia-500',
+    ring: 'group-hover:ring-violet-300',
   },
 ];
 
@@ -43,27 +51,54 @@ export default function AdminPage() {
             </div>
           </CardHeader>
 
-          <CardContent className="grid gap-6 p-6 md:grid-cols-2">
-            {actions.map((action) => {
-              const Icon = action.icon;
-              return (
-                <Link
-                  key={action.href}
-                  href={action.href}
-                  className={`group relative overflow-hidden rounded-xl border border-gray-200 bg-white p-6 shadow-sm ring-2 ring-transparent transition hover:-translate-y-0.5 hover:shadow-md ${action.ring}`}
-                >
-                  <div className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${action.accent}`} />
-                  <div className="flex items-start justify-between">
-                    <div className="rounded-lg bg-gray-100 p-2">
-                      <Icon className="h-5 w-5 text-gray-700" />
+          <CardContent className="grid gap-6 p-6">
+            <div className="grid gap-6 md:grid-cols-2">
+              {actions.slice(0, 2).map((action) => {
+                const Icon = action.icon;
+                return (
+                  <Link
+                    key={action.href}
+                    href={action.href}
+                    className={`group relative overflow-hidden rounded-xl border border-gray-200 bg-white p-6 shadow-sm ring-2 ring-transparent transition hover:-translate-y-0.5 hover:shadow-md ${action.ring}`}
+                  >
+                    <div className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${action.accent}`} />
+                    <div className="flex items-start justify-between">
+                      <div className="rounded-lg bg-gray-100 p-2">
+                        <Icon className="h-5 w-5 text-gray-700" />
+                      </div>
+                      <ArrowRight className="h-5 w-5 text-gray-400 transition group-hover:translate-x-1 group-hover:text-gray-700" />
                     </div>
-                    <ArrowRight className="h-5 w-5 text-gray-400 transition group-hover:translate-x-1 group-hover:text-gray-700" />
-                  </div>
-                  <h3 className="mt-4 text-lg font-semibold text-gray-900">{action.title}</h3>
-                  <p className="mt-2 text-sm text-gray-600">{action.description}</p>
-                </Link>
-              );
-            })}
+                    <h3 className="mt-4 text-lg font-semibold text-gray-900">{action.title}</h3>
+                    <p className="mt-2 text-sm text-gray-600">{action.description}</p>
+                  </Link>
+                );
+              })}
+            </div>
+
+            {actions[2] ? (
+              <div className="mx-auto w-full md:max-w-md">
+                {(() => {
+                  const action = actions[2];
+                  const Icon = action.icon;
+                  return (
+                    <Link
+                      href={action.href}
+                      className={`group relative block overflow-hidden rounded-xl border border-gray-200 bg-white p-6 shadow-sm ring-2 ring-transparent transition hover:-translate-y-0.5 hover:shadow-md ${action.ring}`}
+                    >
+                      <div className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${action.accent}`} />
+                      <div className="flex items-start justify-between">
+                        <div className="rounded-lg bg-gray-100 p-2">
+                          <Icon className="h-5 w-5 text-gray-700" />
+                        </div>
+                        <ArrowRight className="h-5 w-5 text-gray-400 transition group-hover:translate-x-1 group-hover:text-gray-700" />
+                      </div>
+                      <h3 className="mt-4 text-lg font-semibold text-gray-900">{action.title}</h3>
+                      <p className="mt-2 text-sm text-gray-600">{action.description}</p>
+                    </Link>
+                  );
+                })()}
+              </div>
+            ) : null}
           </CardContent>
         </Card>
       </div>
