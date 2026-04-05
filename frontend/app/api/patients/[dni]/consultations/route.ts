@@ -10,7 +10,7 @@ export async function GET(
   try {
     await requireDoctor();
     const { dni } = await params;
-    const consultations = await getConsultationsByPatient(parseInt(dni));
+    const consultations = await getConsultationsByPatient(dni);
 
     return NextResponse.json(consultations);
   } catch (error) {

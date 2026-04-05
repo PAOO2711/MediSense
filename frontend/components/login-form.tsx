@@ -104,10 +104,10 @@ export function LoginForm({
 
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-2">
-                <Checkbox id="remember" />
+                {/* <Checkbox id="remember" />
                 <Label htmlFor="remember" className="text-sm text-slate-600">
                   Mantener sesion
-                </Label>
+                </Label> */}
               </div>
               <a
                 href="#"

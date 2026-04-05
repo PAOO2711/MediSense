@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getConsultationWithDetails } from '@/lib/db/queries';
+import { getConsultationById } from '@/lib/db/queries';
 import { db } from '@/lib/db';
 import { consultations } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
-import { ForbiddenError, requireDoctor, UnauthorizedError } from '@/lib/auth/require-user';
+import { ForbiddenError, requireDoctor, requireRole, UnauthorizedError } from '@/lib/auth/require-user';
 
 // GET /api/consultations/[id] - Obtener una consulta con todos sus detalles
 export async function GET(
@@ -11,9 +11,9 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await requireDoctor();
+    await requireRole();
     const { id } = await params;
-    const consultation = await getConsultationWithDetails(id);
+    const consultation = await getConsultationById(id);
 
     if (!consultation) {
       return NextResponse.json(

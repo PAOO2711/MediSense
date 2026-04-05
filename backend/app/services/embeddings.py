@@ -31,7 +31,7 @@ class EmbeddingsService:
             query_name = "match_documents",
         )
 
-    def retrieve_similar_cases(self, query: str, top_k: int = 5, patient_id: int = None) -> list[dict]:
+    def retrieve_similar_cases(self, query: str, top_k: int = 5, patient_id: str | None = None) -> list[dict]:
         try:
             # Generar embedding de la consulta
             query_embedding = self.embeddings.embed_query(query)

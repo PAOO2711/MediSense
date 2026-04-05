@@ -122,7 +122,7 @@ export default function PacientesPage() {
     }
   };
 
-  const handleViewPatient = (dni: number) => {
+  const handleViewPatient = (dni: string) => {
     router.push(`/pacientes/${dni}`);
   };
 

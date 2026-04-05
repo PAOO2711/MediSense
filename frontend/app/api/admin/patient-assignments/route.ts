@@ -11,7 +11,7 @@ const DEFAULT_PAGE_SIZE = 5;
 const MAX_PAGE_SIZE = 25;
 
 type PatientResult = {
-  dni: number;
+  dni: string;
   name: string;
   email: string | null;
   ownerId: string;
@@ -106,9 +106,9 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    const parsedDni = Number.parseInt(String(dni), 10);
-    if (Number.isNaN(parsedDni)) {
-      return NextResponse.json({ error: 'El DNI debe ser numérico' }, { status: 400 });
+    const normalizedDni = String(dni).trim();
+    if (!normalizedDni) {
+      return NextResponse.json({ error: 'El DNI es obligatorio' }, { status: 400 });
     }
 
     const supabase = createAdminClient();
@@ -133,7 +133,7 @@ export async function PUT(request: NextRequest) {
         owner_id: String(ownerId),
         updated_at: new Date().toISOString(),
       })
-      .eq('dni', parsedDni)
+      .eq('dni', normalizedDni)
       .select('dni,name,owner_id')
       .maybeSingle();
 

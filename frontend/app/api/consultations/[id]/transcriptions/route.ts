@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getTranscriptionsByConsultation } from '@/lib/db/queries';
-import { ForbiddenError, requireDoctor, UnauthorizedError } from '@/lib/auth/require-user';
+import { ForbiddenError, requireRole, UnauthorizedError } from '@/lib/auth/require-user';
 
 // GET /api/consultations/[id]/transcriptions - Obtener transcripciones de una consulta
 export async function GET(
@@ -8,7 +8,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await requireDoctor();
+    await requireRole();
     const { id } = await params;
     const transcriptions = await getTranscriptionsByConsultation(id);
 

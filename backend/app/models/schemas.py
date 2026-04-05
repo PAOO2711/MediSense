@@ -29,4 +29,4 @@ class MedicalAnalysis(BaseModel):
 
 class AnalysisRequest(BaseModel):
     transcription: str = Field(description="Texto transcrito de la consulta")
-    patient_id: int = Field(description="ID del paciente para contexto adicional")
+    patient_id: str = Field(description="DNI/ID del paciente para contexto adicional")

@@ -120,7 +120,7 @@ async def analyze_transcription(
 @app.post("/transcribe_and_analyze")
 async def transcribe_and_analyze(
     file: UploadFile = File(...),
-    patient_id: int = Form(None)
+    patient_id: str = Form(None)
     #patient_context: str = None
 ):
     """

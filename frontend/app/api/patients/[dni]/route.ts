@@ -13,7 +13,7 @@ export async function GET(
   try {
     const user = await requireDoctor();
     const { dni } = await params;
-    const patient = await getPatientByDNI(parseInt(dni), user.id);
+    const patient = await getPatientByDNI(dni, user.id);
 
     if (!patient) {
       return NextResponse.json(
@@ -59,7 +59,7 @@ export async function PUT(
         dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : undefined,
         updatedAt: new Date(),
       })
-      .where(and(eq(patients.dni, parseInt(dni)), eq(patients.ownerId, user.id)))
+      .where(and(eq(patients.dni, dni), eq(patients.ownerId, user.id)))
       .returning();
 
     if (!updated) {
@@ -96,7 +96,7 @@ export async function DELETE(
     
     const [deleted] = await db
       .delete(patients)
-      .where(and(eq(patients.dni, parseInt(dni)), eq(patients.ownerId, user.id)))
+      .where(and(eq(patients.dni, dni), eq(patients.ownerId, user.id)))
       .returning();
 
     if (!deleted) {

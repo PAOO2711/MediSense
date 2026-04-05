@@ -1,6 +1,6 @@
 // Patient types
 export type Patient = {
-  dni: number;
+  dni: string;
   name: string;
   email: string | null;
   phone: string | null;
@@ -12,7 +12,7 @@ export type Patient = {
 // Consultation types
 export type Consultation = {
   id: string;
-  patientId: number | null;
+  patientId: string | null;
   title: string;
   motivoConsulta: string | null;
   description: string | null;
@@ -37,7 +37,7 @@ export type Transcription = {
 // Patient History types
 export type PatientHistory = {
   id: string;
-  patientId: number;
+  patientId: string;
   antecedente: string;
   resumen: string | null;
   status: 'activo' | 'resuelto';

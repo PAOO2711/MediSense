@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Search, UserCheck, UsersRound } from 'lucide-react';
 
 type Patient = {
-  dni: number;
+  dni: string;
   name: string;
   email: string | null;
   ownerId: string;

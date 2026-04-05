@@ -17,11 +17,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const normalizedDni = String(dni).trim();
+    if (!normalizedDni) {
+      return NextResponse.json(
+        { error: 'DNI y nombre son requeridos' },
+        { status: 400 }
+      );
+    }
+
     const phoneTrimmed = phone ? phone.trim() : undefined;
     const emailTrimmed = email ? email.trim() : undefined;
 
     const patient = await createPatient({
-      dni: parseInt(dni, 10),
+      dni: normalizedDni,
       ownerId: user.id,
       name,
       email: emailTrimmed,

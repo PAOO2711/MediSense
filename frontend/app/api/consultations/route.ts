@@ -45,8 +45,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const normalizedPatientId = String(patientId).trim();
+    if (!normalizedPatientId) {
+      return NextResponse.json(
+        { error: 'patientId y title son requeridos' },
+        { status: 400 }
+      );
+    }
+
     const consultation = await createConsultation({
-      patientId: parseInt(patientId),
+      patientId: normalizedPatientId,
       title,
       motivoConsulta,
       anamnesis,

@@ -14,9 +14,9 @@ export async function GET(
   try {
     await requireDoctor();
     const { dni } = await params;
-    const patientDNI = parseInt(dni);
+    const patientDNI = dni.trim();
 
-    if (isNaN(patientDNI)) {
+    if (!patientDNI) {
       return NextResponse.json(
         { error: "DNI inválido" },
         { status: 400 }
@@ -52,9 +52,9 @@ export async function POST(
   try {
     await requireDoctor();
     const { dni } = await params;
-    const patientDNI = parseInt(dni);
+    const patientDNI = dni.trim();
 
-    if (isNaN(patientDNI)) {
+    if (!patientDNI) {
       return NextResponse.json(
         { error: "DNI inválido" },
         { status: 400 }

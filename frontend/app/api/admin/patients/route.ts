@@ -21,10 +21,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const parsedDni = Number.parseInt(String(dni), 10);
-    if (Number.isNaN(parsedDni)) {
+    const normalizedDni = String(dni).trim();
+    if (!normalizedDni) {
       return NextResponse.json(
-        { error: 'El DNI debe ser numérico' },
+        { error: 'El DNI es obligatorio' },
         { status: 400 }
       );
     }
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
     }
 
     const patient = await createPatient({
-      dni: parsedDni,
+      dni: normalizedDni,
       ownerId,
       name: String(name).trim(),
       email: email ? String(email).trim() : undefined,

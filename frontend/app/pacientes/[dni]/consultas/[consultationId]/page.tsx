@@ -68,20 +68,45 @@ export default function ConsultaDetailPage({
           setPatient(patientData);
         }
 
-        // Fetch consultation
-        const consultationRes = await fetch(`/api/consultations/${resolvedParams.consultationId}`);
-        if (!consultationRes.ok) {
+        // Fetch consultation from the patient's own consultations list
+        const consultationsRes = await fetch(`/api/patients/${resolvedParams.dni}/consultations`);
+        if (!consultationsRes.ok) {
+          const consultationsError = await consultationsRes.json().catch(() => null);
+          const backendMessage =
+            consultationsError && typeof consultationsError.error === 'string'
+              ? consultationsError.error
+              : null;
+
+          if (consultationsRes.status === 401) {
+            throw new Error('Tu sesión expiró. Vuelve a iniciar sesión.');
+          }
+
+          if (consultationsRes.status === 403) {
+            throw new Error('No tienes permisos para ver esta consulta.');
+          }
+
+          throw new Error(backendMessage ?? 'No se pudieron cargar las consultas del paciente');
+        }
+
+        const consultationsData = await consultationsRes.json();
+        const matchedConsultation = Array.isArray(consultationsData)
+          ? consultationsData.find((c: Consultation) => c.id === resolvedParams.consultationId)
+          : null;
+
+        if (!matchedConsultation) {
           throw new Error('Consulta no encontrada');
         }
-        const consultationData = await consultationRes.json();
-        setConsultation(consultationData);
+
+        setConsultation(matchedConsultation);
 
         // Fetch transcription
         const transcriptionRes = await fetch(`/api/consultations/${resolvedParams.consultationId}/transcriptions`);
         if (transcriptionRes.ok) {
           const transcriptionData = await transcriptionRes.json();
-          if (transcriptionData.length > 0) {
+          if (Array.isArray(transcriptionData) && transcriptionData.length > 0) {
             setTranscription(transcriptionData[0]);
+          } else {
+            setTranscription(null);
           }
         }
 
@@ -89,11 +114,15 @@ export default function ConsultaDetailPage({
         const historyRes = await fetch(`/api/patients/${resolvedParams.dni}/history`);
         if (historyRes.ok) {
           const historyData = await historyRes.json();
-          // Filter antecedents that were diagnosed in this consultation
-          const related = historyData.filter(
-            (h: PatientHistory) => h.consultationId === resolvedParams.consultationId
-          );
-          setRelatedAntecedents(related);
+          if (Array.isArray(historyData)) {
+            // Filter antecedents that were diagnosed in this consultation
+            const related = historyData.filter(
+              (h: PatientHistory) => h.consultationId === resolvedParams.consultationId
+            );
+            setRelatedAntecedents(related);
+          } else {
+            setRelatedAntecedents([]);
+          }
         }
 
       } catch (err) {
@@ -133,7 +162,7 @@ export default function ConsultaDetailPage({
             <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
             <h2 className="text-xl font-semibold mb-2">Error</h2>
             <p className="text-gray-600 mb-4">{error || 'Consulta no encontrada'}</p>
-            <Button onClick={() => router.back()}>
+            <Button onClick={() => router.push(`/pacientes/${resolvedParams.dni}`)}>
               <ArrowLeft className="h-4 w-4 mr-2" />
               Volver
             </Button>

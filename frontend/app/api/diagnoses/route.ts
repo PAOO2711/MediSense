@@ -36,18 +36,17 @@ export async function POST(request: NextRequest) {
     await requireDoctor();
     const body = await request.json();
     
-    const { consultationId, transcriptionId, diagnosis, confidence, recommendations, modelUsed } = body;
+    const { consultationId, diagnosis, confidence, recommendations, modelUsed } = body;
 
-    if (!consultationId || !transcriptionId || !diagnosis) {
+    if (!consultationId || !diagnosis) {
       return NextResponse.json(
-        { error: 'consultationId, transcriptionId y diagnosis son requeridos' },
+        { error: 'consultationId y diagnosis son requeridos' },
         { status: 400 }
       );
     }
 
     const aiDiagnosis = await createAiDiagnosis({
       consultationId,
-      transcriptionId,
       diagnosis,
       confidence,
       recommendations,

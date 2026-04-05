@@ -102,7 +102,7 @@ class MedicalAnalysisService:
     def analyze_transcription(
         self, 
         transcription: str,
-        patient_id: int 
+        patient_id: str
         #patient_context: Optional[str] = None
     ) -> MedicalAnalysis:
         """

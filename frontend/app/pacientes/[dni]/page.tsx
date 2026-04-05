@@ -237,16 +237,16 @@ export default function PatientDetailPage({ params }: { params: Promise<{ dni: s
               <hr className="border-gray-200" />
 
               {/* Actions */}
-              <div className="space-y-2">
+              {/* <div className="space-y-2">
                 <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white gap-2 shadow-md">
                   <Edit className="h-4 w-4" />
                   Editar paciente
                 </Button>
-                {/* <Button variant="outline" className="w-full text-red-600 border-red-200 hover:text-red-700 hover:bg-red-50 gap-2">
+                <Button variant="outline" className="w-full text-red-600 border-red-200 hover:text-red-700 hover:bg-red-50 gap-2">
                   <Trash2 className="h-4 w-4" />
                   Eliminar paciente
-                </Button> */}
-              </div>
+                </Button>
+              </div> */}
             </CardContent>
           </Card>
 
