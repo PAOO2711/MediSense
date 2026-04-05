@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 
 export default function AdminPatientsPage() {
   return (
-    <main className="min-h-screen bg-white">
+    <main className="min-h-screen bg-gray-50">
       <AdminHeader subtitle="Panel de administración - Alta de pacientes" />
 
       <div className="container mx-auto px-4 py-8">
