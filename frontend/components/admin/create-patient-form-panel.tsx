@@ -176,7 +176,7 @@ export function CreatePatientFormPanel() {
           <div>
             <CardTitle className="text-xl text-gray-900">Alta de pacientes con asignación de médico</CardTitle>
             <CardDescription className="text-gray-500">
-              Crea un paciente y vincúlalo al ownerId de un médico existente.
+              Crea un paciente y vincúlalo a un médico existente.
             </CardDescription>
           </div>
         </div>

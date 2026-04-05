@@ -114,7 +114,7 @@ export default function PatientDetailPage({ params }: { params: Promise<{ dni: s
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600"></div>
           <p className="text-gray-600">Cargando información del paciente...</p>
@@ -125,7 +125,7 @@ export default function PatientDetailPage({ params }: { params: Promise<{ dni: s
 
   if (!patient) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <Card className="max-w-md border border-gray-200 shadow-lg">
           <CardContent className="pt-6 text-center">
             <User className="h-12 w-12 text-gray-300 mx-auto mb-4" />
@@ -145,7 +145,7 @@ export default function PatientDetailPage({ params }: { params: Promise<{ dni: s
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gray-50">
       {/* Header con gradiente médico */}
       <div className="bg-gradient-to-r from-blue-600 via-blue-500 to-teal-500 text-white">
         <div className="container mx-auto px-4 py-6">

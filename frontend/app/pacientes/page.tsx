@@ -131,7 +131,7 @@ export default function PacientesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gray-50">
       {/* Header con gradiente médico */}
       <div className="bg-gradient-to-r from-blue-600 via-blue-500 to-teal-500 text-white">
         <div className="container mx-auto px-4 py-6">
@@ -177,12 +177,12 @@ export default function PacientesPage() {
                   </CardDescription>
                 </div>
               </div>
-              <Button 
+              {/* <Button 
                 onClick={handleCreatePatient}
                 className="bg-teal-600 hover:bg-teal-700 text-white gap-2 shadow-md">
                 <UserPlus className="h-4 w-4" />
                 Nuevo Paciente
-              </Button>
+              </Button> */}
             </div>
           </CardHeader>
 
