@@ -6,6 +6,14 @@ info:
 http:
   method: POST
   url: "{{frontendUrl}}/transcriptions"
+  body:
+    type: json
+    data: |-
+      {
+        "consultationId": {{consultationId}},
+        "fullText": "Texto de prueba",
+        "duration": 1.0
+      }
   auth: inherit
 
 settings:

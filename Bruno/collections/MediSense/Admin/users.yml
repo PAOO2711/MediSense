@@ -1,0 +1,27 @@
+info:
+  name: /users
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{frontendUrl}}/admin/users"
+  body:
+    type: json
+    data: |-
+      {
+        "dni": ,
+        "name": ,
+        "surname": ,
+        "email": ,
+        "phone": ,
+        "dateOfBirth": ,
+        "password": 
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -1,0 +1,26 @@
+info:
+  name: /patients
+  type: http
+  seq: 3
+
+http:
+  method: POST
+  url: "{{frontendUrl}}/admin/patients"
+  body:
+    type: json
+    data: |-
+      {
+        "dni": {{dni}},
+        "ownerId": {{ownerId}},
+        "name": ,
+        "email": ,
+        "phone": ,
+        "dateOfBirth": 
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

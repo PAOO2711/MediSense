@@ -1,7 +1,12 @@
 info:
   name: Transcriptions
   type: folder
-  seq: 6
+  seq: 1
 
 request:
   auth: inherit
+  variables:
+    - name: id
+      value: 8c648eb8-2270-424e-bd9c-3ea5a3fdd8bd
+    - name: consultationId
+      value: 717bc4d4-4f5a-4929-b6b0-260b683f3de5
