@@ -1,7 +1,10 @@
 info:
   name: Patients
   type: folder
-  seq: 2
+  seq: 1
 
 request:
   auth: inherit
+  variables:
+    - name: dni
+      value: 78009650H

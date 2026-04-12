@@ -1,0 +1,12 @@
+info:
+  name: Consultations
+  type: folder
+  seq: 1
+
+request:
+  auth: inherit
+  variables:
+    - name: dni
+      value: 78009650H
+    - name: id
+      value: b29be5f0-07d7-4463-8e25-93428e20079a

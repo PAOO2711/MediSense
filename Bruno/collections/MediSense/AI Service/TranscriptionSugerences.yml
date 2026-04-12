@@ -5,7 +5,7 @@ info:
 
 http:
   method: POST
-  url: http://localhost:8000/analyze
+  url: http://{{backendUrl}}/analyze
   body:
     type: json
     data: |-

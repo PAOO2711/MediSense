@@ -1,0 +1,27 @@
+info:
+  name: _/consultations
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{frontendUrl}}/consultations"
+  body:
+    type: json
+    data: |-
+      {
+        "patientId": "{{dni}}",
+        "title": "Creando consulta desde Bruno",
+        "motivoConsulta": "Bruneando",
+        "anamnesis": "Test bruno",
+        "pruebas": "Pasea a bruno",
+        "diagnostico": "Bruno",
+        "status": "active"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

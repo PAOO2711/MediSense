@@ -1,11 +1,11 @@
 info:
-  name: getPatients
+  name: /transcriptions
   type: http
   seq: 1
 
 http:
   method: GET
-  url: "{{frontendUrl}}/patients"
+  url: "{{frontendUrl}}/transcriptions"
   auth: inherit
 
 settings:

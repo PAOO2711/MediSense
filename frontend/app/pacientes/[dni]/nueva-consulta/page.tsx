@@ -61,6 +61,7 @@ export default function NuevaConsultaPage({ params }: { params: Promise<{ dni: s
   const [recordingTime, setRecordingTime] = useState(0);
   const [recordingStatus, setRecordingStatus] = useState<string>('Listo para grabar');
   const [transcription, setTranscription] = useState('');
+  const [duration, setDuration] = useState(0);
   
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -203,6 +204,7 @@ export default function NuevaConsultaPage({ params }: { params: Promise<{ dni: s
       // Extraer transcripción
       if (result.transcription?.success) {
         setTranscription(result.transcription.full_text);
+        setDuration(result.transcription.duration);
         setRecordingStatus('Transcripción completada');
       } else {
         setRecordingStatus('Error en transcripción');
@@ -296,6 +298,7 @@ export default function NuevaConsultaPage({ params }: { params: Promise<{ dni: s
           body: JSON.stringify({
             consultationId: consultation.id,
             fullText: transcription,
+            duration: duration,
           })
         });
       }
