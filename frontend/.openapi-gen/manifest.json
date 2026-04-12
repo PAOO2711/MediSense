@@ -1,0 +1,146 @@
+{
+  "configPath": "/home/pedri/medisense/frontend/next.openapi.json",
+  "outputFile": "/home/pedri/medisense/frontend/public/openapi.json",
+  "diagnostics": [
+    {
+      "code": "missing-path-params-type",
+      "severity": "warning",
+      "message": "Route /consultations/{id}/diagnoses contains path parameters id but no @pathParams type is defined.",
+      "filePath": "app/api/consultations/[id]/diagnoses/route.ts",
+      "routePath": "/consultations/{id}/diagnoses"
+    },
+    {
+      "code": "missing-path-params-type",
+      "severity": "warning",
+      "message": "Route /consultations/{id} contains path parameters id but no @pathParams type is defined.",
+      "filePath": "app/api/consultations/[id]/route.ts",
+      "routePath": "/consultations/{id}"
+    },
+    {
+      "code": "missing-path-params-type",
+      "severity": "warning",
+      "message": "Route /consultations/{id} contains path parameters id but no @pathParams type is defined.",
+      "filePath": "app/api/consultations/[id]/route.ts",
+      "routePath": "/consultations/{id}"
+    },
+    {
+      "code": "missing-path-params-type",
+      "severity": "warning",
+      "message": "Route /consultations/{id} contains path parameters id but no @pathParams type is defined.",
+      "filePath": "app/api/consultations/[id]/route.ts",
+      "routePath": "/consultations/{id}"
+    },
+    {
+      "code": "missing-path-params-type",
+      "severity": "warning",
+      "message": "Route /consultations/{id}/transcriptions contains path parameters id but no @pathParams type is defined.",
+      "filePath": "app/api/consultations/[id]/transcriptions/route.ts",
+      "routePath": "/consultations/{id}/transcriptions"
+    },
+    {
+      "code": "missing-path-params-type",
+      "severity": "warning",
+      "message": "Route /diagnoses/{id} contains path parameters id but no @pathParams type is defined.",
+      "filePath": "app/api/diagnoses/[id]/route.ts",
+      "routePath": "/diagnoses/{id}"
+    },
+    {
+      "code": "missing-path-params-type",
+      "severity": "warning",
+      "message": "Route /diagnoses/{id} contains path parameters id but no @pathParams type is defined.",
+      "filePath": "app/api/diagnoses/[id]/route.ts",
+      "routePath": "/diagnoses/{id}"
+    },
+    {
+      "code": "missing-path-params-type",
+      "severity": "warning",
+      "message": "Route /patients/{dni}/consultations contains path parameters dni but no @pathParams type is defined.",
+      "filePath": "app/api/patients/[dni]/consultations/route.ts",
+      "routePath": "/patients/{dni}/consultations"
+    },
+    {
+      "code": "missing-path-params-type",
+      "severity": "warning",
+      "message": "Route /patients/{dni}/history contains path parameters dni but no @pathParams type is defined.",
+      "filePath": "app/api/patients/[dni]/history/route.ts",
+      "routePath": "/patients/{dni}/history"
+    },
+    {
+      "code": "missing-path-params-type",
+      "severity": "warning",
+      "message": "Route /patients/{dni}/history contains path parameters dni but no @pathParams type is defined.",
+      "filePath": "app/api/patients/[dni]/history/route.ts",
+      "routePath": "/patients/{dni}/history"
+    },
+    {
+      "code": "missing-path-params-type",
+      "severity": "warning",
+      "message": "Route /patients/{dni}/history contains path parameters dni but no @pathParams type is defined.",
+      "filePath": "app/api/patients/[dni]/history/route.ts",
+      "routePath": "/patients/{dni}/history"
+    },
+    {
+      "code": "missing-path-params-type",
+      "severity": "warning",
+      "message": "Route /patients/{dni} contains path parameters dni but no @pathParams type is defined.",
+      "filePath": "app/api/patients/[dni]/route.ts",
+      "routePath": "/patients/{dni}"
+    },
+    {
+      "code": "missing-path-params-type",
+      "severity": "warning",
+      "message": "Route /patients/{dni} contains path parameters dni but no @pathParams type is defined.",
+      "filePath": "app/api/patients/[dni]/route.ts",
+      "routePath": "/patients/{dni}"
+    },
+    {
+      "code": "missing-path-params-type",
+      "severity": "warning",
+      "message": "Route /patients/{dni} contains path parameters dni but no @pathParams type is defined.",
+      "filePath": "app/api/patients/[dni]/route.ts",
+      "routePath": "/patients/{dni}"
+    },
+    {
+      "code": "missing-path-params-type",
+      "severity": "warning",
+      "message": "Route /transcriptions/{id} contains path parameters id but no @pathParams type is defined.",
+      "filePath": "app/api/transcriptions/[id]/route.ts",
+      "routePath": "/transcriptions/{id}"
+    },
+    {
+      "code": "missing-path-params-type",
+      "severity": "warning",
+      "message": "Route /transcriptions/{id} contains path parameters id but no @pathParams type is defined.",
+      "filePath": "app/api/transcriptions/[id]/route.ts",
+      "routePath": "/transcriptions/{id}"
+    }
+  ],
+  "performance": {
+    "prepareTemplateMs": 0.08502099999998336,
+    "loadCustomFragmentsMs": 0.0005459999999857246,
+    "prepareDocumentMs": 0.08556699999996908,
+    "scanRouteFilesMs": 0.7912969999999859,
+    "deriveRoutePathMs": 0.42303299999878163,
+    "filterRouteCandidatesMs": 0.048140000000330474,
+    "sourcePrecheckMs": 1.2647459999994908,
+    "readRouteFilesMs": 1.0372940000002018,
+    "parseRouteFilesMs": 46.63644400000055,
+    "analyzeRouteFilesMs": 48.425061000000255,
+    "typescriptResponseInferenceMs": 4711.642864000002,
+    "processRouteFilesMs": 4807.328831999998,
+    "registerRouteMs": 6.0153070000023945,
+    "getSchemaContentMs": 0,
+    "createRequestParamsMs": 0.39067200000044977,
+    "createRequestBodyMs": 0,
+    "processResponsesMs": 3.0755010000038965,
+    "createResponseSchemaMs": 0,
+    "buildOperationsMs": 6.132004000000052,
+    "sortAndMergePathsMs": 1.0734019999999873,
+    "buildPathsMs": 1.0734019999999873,
+    "defaultComponentsAndErrorsMs": 0.25826099999994767,
+    "mergeSchemasMs": 0.07391800000004878,
+    "finalizeDocumentMs": 13.99826799999937,
+    "totalMs": 4832.130886999999,
+    "scanRoutesMs": 4814.252132999998
+  }
+}
