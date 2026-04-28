@@ -6,7 +6,8 @@ USER_PROMPT_MEDICAL_ANALYSIS = """Analiza la siguiente transcripción de una con
     4. Sugerir posibles condiciones médicas a considerar (tipo: "condition")
     5. Recomendar exámenes, pruebas o acciones (tipo: "recommendation")
 
-    Sé claro, conciso y profesional. Proporciona justificaciones sólidas para cada sugerencia.
+    Sé claro, conciso y profesional. Proporciona justificaciones sólidas pero breves para cada sugerencia.
+    Prioriza lo clínicamente más relevante y evita redundancias.
 
     TRANSCRIPCIÓN:
     {transcription}

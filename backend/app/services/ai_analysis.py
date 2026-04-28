@@ -14,6 +14,11 @@ from app.prompts.user_prompts import USER_PROMPT_MEDICAL_ANALYSIS, USER_RAG_PROM
 
 logger = logging.getLogger(__name__)
 
+MAX_TRANSCRIPTION_CHARS = 5000
+MAX_RAG_CASES = 2
+MAX_RAG_CASE_CHARS = 500
+MAX_CONTEXT_SECTION_CHARS = 1400
+
 """ document = Document(
     page_content="Hello, world!", metadata={"source": "https://example.com"}
 ) """
@@ -87,10 +92,21 @@ class MedicalAnalysisService:
             # Preparar el contexto
             context_section = ""
 
+            if len(transcription) > MAX_TRANSCRIPTION_CHARS:
+                transcription = transcription[:MAX_TRANSCRIPTION_CHARS]
+                logger.info(
+                    "✂️ Transcripción recortada a %s caracteres para reducir latencia",
+                    MAX_TRANSCRIPTION_CHARS,
+                )
+
             query = USER_RAG_PROMPT
 
             # Recuperar contexto del paciente usando embeddings
-            patient_context = self.embeddings_service.retrieve_similar_cases(query=query, top_k=5, patient_id=patient_id)
+            patient_context = self.embeddings_service.retrieve_similar_cases(
+                query=query,
+                top_k=MAX_RAG_CASES,
+                patient_id=patient_id,
+            )
 
             #logger.info(f"📚 Contexto recuperado: {len(patient_context)} casos similares encontrados para el paciente_id={patient_id}")
             logger.info(f"CONTEXTO RECUPERADO: {patient_context}")
@@ -98,9 +114,11 @@ class MedicalAnalysisService:
             # Formatear contexto del paciente de forma legible
             if patient_context and len(patient_context) > 0:
                 formatted_context = "\n\n".join([
-                    f"Consulta previa:\n{case['content']}" 
+                    f"Consulta previa:\n{case['content'][:MAX_RAG_CASE_CHARS]}" 
                     for case in patient_context
                 ])
+                if len(formatted_context) > MAX_CONTEXT_SECTION_CHARS:
+                    formatted_context = formatted_context[:MAX_CONTEXT_SECTION_CHARS]
                 context_section = f"\nCONTEXTO DEL PACIENTE (Consultas previas relevantes):\n{formatted_context}\n"
             else:
                 context_section = "\nCONTEXTO DEL PACIENTE:\nPrimera consulta registrada. No hay historial previo disponible.\n"
