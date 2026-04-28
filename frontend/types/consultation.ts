@@ -53,4 +53,6 @@ export type AISuggestion = {
   type: 'symptom' | 'condition' | 'recommendation';
   text: string;
   confidence: number;
+  description?: string;
+  source: 'identified' | 'suggested';
 };

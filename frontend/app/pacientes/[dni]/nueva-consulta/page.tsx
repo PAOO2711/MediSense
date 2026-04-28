@@ -211,7 +211,7 @@ export default function NuevaConsultaPage({ params }: { params: Promise<{ dni: s
         return;
       }
 
-      // Extraer y mapear sugerencias de IA
+      // Extraer y mapear síntomas e sugerencias de IA
       if (result.analysis) {
         setLoadingSuggestions(true);
         
@@ -220,14 +220,34 @@ export default function NuevaConsultaPage({ params }: { params: Promise<{ dni: s
           setAiAnalysisResumen(result.analysis.resumen);
         }
         
-        const aiSuggestions: AISuggestion[] = result.analysis.sugerencias.map((sug: any, index: number) => ({
-          id: `ai-${Date.now()}-${index}`,
-          type: sug.tipo as 'symptom' | 'condition' | 'recommendation',
-          text: sug.contenido,
-          confidence: sug.confianza
+        // Mapear síntomas identificados (confianza 1.0 porque fueron identificados directamente)
+        const identifiedSymptoms: AISuggestion[] = (result.analysis.sintomas_identificados || []).map((sym: any, index: number) => ({
+          id: `symptom-${Date.now()}-${index}`,
+          type: 'symptom' as const,
+          text: sym.nombre,
+          description: sym.descripcion,
+          confidence: 1.0,
+          source: 'identified' as const
         }));
         
-        setAiSuggestions(aiSuggestions);
+        // Mapear sugerencias de IA
+        const suggestedItems: AISuggestion[] = (result.analysis.sugerencias || []).map((sug: any, index: number) => ({
+          id: `suggestion-${Date.now()}-${index}`,
+          type: sug.tipo as 'symptom' | 'condition' | 'recommendation',
+          text: sug.contenido,
+          description: sug.justificacion,
+          confidence: sug.confianza,
+          source: 'suggested' as const
+        }));
+        
+        // Agrupar: primero síntomas identificados, luego otras sugerencias, luego sugerencias de síntomas
+        const allSuggestions: AISuggestion[] = [
+          ...identifiedSymptoms,
+          ...suggestedItems.filter(s => s.type !== 'symptom'),
+          ...suggestedItems.filter(s => s.type === 'symptom')
+        ];
+        
+        setAiSuggestions(allSuggestions);
         setLoadingSuggestions(false);
       }
 
@@ -768,11 +788,18 @@ export default function NuevaConsultaPage({ params }: { params: Promise<{ dni: s
                               >
                                 {getSuggestionTypeLabel(suggestion.type)}
                               </Badge>
-                              <span className="text-xs text-gray-400">
-                                {Math.round(suggestion.confidence * 100)}% conf.
-                              </span>
+                              {suggestion.source === 'identified' ? (
+                                <span className="text-xs font-semibold text-green-600 bg-green-50 px-2 py-0.5 rounded">Identificado</span>
+                              ) : (
+                                <span className="text-xs text-gray-400">
+                                  {Math.round(suggestion.confidence * 100)}% conf.
+                                </span>
+                              )}
                             </div>
-                            <p className="text-sm text-gray-700">{suggestion.text}</p>
+                            <p className="text-sm text-gray-700 font-medium">{suggestion.text}</p>
+                            {suggestion.description && (
+                              <p className="text-xs text-gray-500 mt-1">{suggestion.description}</p>
+                            )}
                           </div>
                           <Plus className="h-5 w-5 text-gray-400 group-hover:text-purple-500 transition-colors" />
                         </div>
