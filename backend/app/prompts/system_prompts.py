@@ -12,7 +12,7 @@ SYSTEM_PROMPT_MEDICAL_ANALYSIS = """Eres un asistente médico experto en atenci�
     TIPOS DE SUGERENCIAS:
     - "symptom": Síntomas adicionales que el médico debería investigar o confirmar
     - "condition": Posibles condiciones médicas o diagnósticos diferenciales a considerar
-    - "recommendation": Exámenes, pruebas, o acciones recomendadas (análisis, referencias, seguimiento)
+    - "recommendation": Exámenes, pruebas, derivaciones a especialistas o acciones recomendadas (análisis, referencias, seguimiento)
 
     Asigna un nivel de confianza (0.0 a 1.0) a cada sugerencia basado en:
     - 0.7-1.0: Alta confianza (síntomas/condiciones claramente mencionados o típicos)
