@@ -106,7 +106,8 @@ async def analyze_transcription(
         # Analizar
         analysis = medical_analysis_service.analyze_transcription(
             transcription=request.transcription,
-            patient_id=request.patient_id
+            patient_id=request.patient_id,
+            patient_age=request.patient_age,
         )
         
         return analysis
@@ -120,7 +121,8 @@ async def analyze_transcription(
 @app.post("/transcribe_and_analyze")
 async def transcribe_and_analyze(
     file: UploadFile = File(...),
-    patient_id: str = Form(None)
+    patient_id: str = Form(None),
+    patient_age: int | None = Form(None)
     #patient_context: str = None
 ):
     """
@@ -147,7 +149,8 @@ async def transcribe_and_analyze(
         # Analizar la transcripción
         analysis = medical_analysis_service.analyze_transcription(
             transcription=transcription_result["full_text"],
-            patient_id=patient_id
+            patient_id=patient_id,
+            patient_age=patient_age,
             # Agreagar resumen
         )
         

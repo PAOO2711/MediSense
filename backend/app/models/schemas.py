@@ -30,3 +30,4 @@ class MedicalAnalysis(BaseModel):
 class AnalysisRequest(BaseModel):
     transcription: str = Field(description="Texto transcrito de la consulta")
     patient_id: str = Field(description="DNI/ID del paciente para contexto adicional")
+    patient_age: Optional[int] = Field(default=None, description="Edad del paciente")

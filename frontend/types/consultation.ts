@@ -5,6 +5,7 @@ export type Patient = {
   email: string | null;
   phone: string | null;
   dateOfBirth?: Date | string | null;
+  age?: number | null;
   createdAt?: Date | string;
   updatedAt?: Date | string;
 };

@@ -12,8 +12,13 @@ USER_PROMPT_MEDICAL_ANALYSIS = """Analiza la siguiente transcripción de una con
     Sé claro, conciso y profesional. Proporciona justificaciones sólidas pero breves para cada sugerencia.
     Prioriza lo clínicamente más relevante y evita redundancias.
 
+    Ten en cuenta la edad del paciente para contextualizar mejor los síntomas y posibles condiciones. Si no se proporciona edad, haz un análisis general sin suposiciones específicas de edad.
+
     TRANSCRIPCIÓN:
     {transcription}
+
+    EDAD DEL PACIENTE:
+    {patient_age}
 
     CONTEXTO DEL PACIENTE:
     {context_section}

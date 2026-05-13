@@ -5,6 +5,27 @@ import { patients } from '@/lib/db/schema';
 import { and, eq } from 'drizzle-orm';
 import { ForbiddenError, requireDoctor, UnauthorizedError } from '@/lib/auth/require-user';
 
+function calculateAge(dateOfBirth: Date | string | null | undefined): number | null {
+  if (!dateOfBirth) {
+    return null;
+  }
+
+  const birthDate = new Date(dateOfBirth);
+  if (Number.isNaN(birthDate.getTime())) {
+    return null;
+  }
+
+  const today = new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDiff = today.getMonth() - birthDate.getMonth();
+
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+    age -= 1;
+  }
+
+  return age;
+}
+
 // GET /api/patients/[dni] - Obtener un paciente por DNI
 export async function GET(
   request: NextRequest,
@@ -22,7 +43,10 @@ export async function GET(
       );
     }
 
-    return NextResponse.json(patient);
+    return NextResponse.json({
+      ...patient,
+      age: calculateAge(patient.dateOfBirth),
+    });
   } catch (error) {
     if (error instanceof UnauthorizedError) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

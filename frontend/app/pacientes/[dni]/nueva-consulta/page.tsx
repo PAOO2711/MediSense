@@ -183,6 +183,9 @@ export default function NuevaConsultaPage({ params }: { params: Promise<{ dni: s
       const formData = new FormData();
       formData.append('file', audioBlob, 'recording.webm');
       formData.append('patient_id', resolvedParams.dni); // Pasar el DNI del paciente para contexto adicional
+      if (patient?.age != null) {
+        formData.append('patient_age', String(patient.age));
+      }
 
       //const { data: { session } } = await supabase.auth.getSession();
 

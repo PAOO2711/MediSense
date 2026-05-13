@@ -70,7 +70,8 @@ class MedicalAnalysisService:
     def analyze_transcription(
         self, 
         transcription: str,
-        patient_id: str
+        patient_id: str,
+        patient_age: int | None = None,
         #patient_context: Optional[str] = None
     ) -> MedicalAnalysis:
         """
@@ -126,6 +127,7 @@ class MedicalAnalysisService:
             # Ejecutar el análisis
             chain_input = {
                 "transcription": transcription,
+                "patient_age": str(patient_age) if patient_age is not None else "No disponible",
                 "context_section": context_section,
             }
             if self.parser:
