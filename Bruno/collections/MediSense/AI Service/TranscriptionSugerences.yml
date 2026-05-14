@@ -1,0 +1,25 @@
+info:
+  name: TranscriptionSugerences
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{backendUrl}}analyze"
+  body:
+    type: json
+    data: |-
+      {
+        "transcription": "Doctor, desde hace unos días noto algo raro en el pecho. ¿A qué te refieres exactamente con “raro”? No sé… como una molestia, pero no sabría describirla bien. ¿Es dolor, presión, pinchazo…? A veces parece presión y otras como ardor. ¿Cuándo aparece? Sobre todo después de comer, aunque ayer me pasó caminando rápido. ¿Se va solo? Sí, normalmente sí. ¿Tienes dificultad para respirar? Bueno… un poco, pero tampoco mucho. ¿Has tenido esto antes? Creo que sí, hace meses, pero no le di importancia.",
+        "patient_id": "78009650H",
+        "patient_age": 20
+      }
+  auth:
+    type: bearer
+    token: "{{JWT_TOKEN}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

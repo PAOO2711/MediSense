@@ -21,7 +21,7 @@ fi
 # Verificar si existe entorno virtual para backend
 if [ ! -d "backend/venv" ]; then
     echo "🐍 Creando entorno virtual para backend..."
-    cd backend && python -m venv venv && cd ..
+    cd backend && python3 -m venv venv && cd ..
 fi
 
 # Activar entorno virtual e instalar dependencias
@@ -33,7 +33,7 @@ cd ..
 
 # Iniciar backend
 echo "🔧 Iniciando backend (FastAPI)..."
-cd backend && source venv/bin/activate && python main.py &
+cd backend && source venv/bin/activate && python3 app/main.py &
 cd ..
 
 # Esperar un poco para que el backend se inicie

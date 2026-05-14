@@ -1,0 +1,22 @@
+info:
+  name: _/patient-assignements
+  type: http
+  seq: 5
+
+http:
+  method: PUT
+  url: "{{frontendUrl}}/admin/patient-assignments"
+  body:
+    type: json
+    data: |-
+      {
+        "dni": {{dni}},
+        "ownerId": {{ownerId}}
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
