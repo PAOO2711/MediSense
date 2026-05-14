@@ -1,0 +1,15 @@
+info:
+  name: Health
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: https://medisense-backend-674385560657.europe-southwest1.run.app/health
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

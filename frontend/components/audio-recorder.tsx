@@ -103,7 +103,8 @@ export default function FullAudioRecorder() {
       const formData = new FormData()
       formData.append('file', audioBlob, 'recording.webm')
 
-      const response = await fetch('http://localhost:8000/transcribe_file', {
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
+      const response = await fetch(`${backendUrl}/transcribe_file`, {
         method: 'POST',
         body: formData
       })

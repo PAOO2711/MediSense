@@ -189,7 +189,8 @@ export default function NuevaConsultaPage({ params }: { params: Promise<{ dni: s
 
       //const { data: { session } } = await supabase.auth.getSession();
 
-      const response = await fetch('http://localhost:8000/transcribe_and_analyze', {
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
+      const response = await fetch(`${backendUrl}/transcribe_and_analyze`, {
         method: 'POST',
         /* headers: {
           "Content-Type": "application/json",
