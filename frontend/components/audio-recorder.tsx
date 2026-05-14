@@ -232,9 +232,9 @@ export default function FullAudioRecorder() {
         <CardContent className="pt-6">
           <h4 className="font-semibold mb-2">Instrucciones:</h4>
           <ul className="text-sm text-gray-600 space-y-1">
-            <li>1. Haz clic en "Iniciar Grabación" para comenzar</li>
+            <li>1. Haz clic en &quot;Iniciar Grabación&quot; para comenzar</li>
             <li>2. Habla durante todo el tiempo que necesites</li>
-            <li>3. Haz clic en "Detener y Transcribir" cuando termines</li>
+            <li>3. Haz clic en &quot;Detener y Transcribir&quot; cuando termines</li>
             <li>4. Espera a que se procese la grabación completa</li>
             <li>5. Obtén la transcripción con timestamps detallados</li>
           </ul>
