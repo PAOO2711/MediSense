@@ -224,22 +224,22 @@ export default function NuevaConsultaPage({ params }: { params: Promise<{ dni: s
         }
         
         // Mapear síntomas identificados (confianza 1.0 porque fueron identificados directamente)
-        const identifiedSymptoms: AISuggestion[] = (result.analysis.sintomas_identificados || []).map((sym: any, index: number) => ({
+        const identifiedSymptoms: AISuggestion[] = (result.analysis.sintomas_identificados || []).map((sym: Record<string, unknown>, index: number) => ({
           id: `symptom-${Date.now()}-${index}`,
           type: 'symptom' as const,
-          text: sym.nombre,
-          description: sym.descripcion,
+          text: String(sym['nombre'] ?? ''),
+          description: String(sym['descripcion'] ?? ''),
           confidence: 1.0,
           source: 'identified' as const
         }));
         
         // Mapear sugerencias de IA
-        const suggestedItems: AISuggestion[] = (result.analysis.sugerencias || []).map((sug: any, index: number) => ({
+        const suggestedItems: AISuggestion[] = (result.analysis.sugerencias || []).map((sug: Record<string, unknown>, index: number) => ({
           id: `suggestion-${Date.now()}-${index}`,
-          type: sug.tipo as 'symptom' | 'condition' | 'recommendation',
-          text: sug.contenido,
-          description: sug.justificacion,
-          confidence: sug.confianza,
+          type: (String(sug['tipo']) as 'symptom' | 'condition' | 'recommendation'),
+          text: String(sug['contenido'] ?? ''),
+          description: String(sug['justificacion'] ?? ''),
+          confidence: Number(sug['confianza']) || 0,
           source: 'suggested' as const
         }));
         

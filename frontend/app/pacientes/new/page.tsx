@@ -1,5 +1,6 @@
 import { CreatePatientForm } from "@/components/new-patient-form"
 import { Activity, Stethoscope } from "lucide-react"
+import Link from 'next/link'
 
 export default function Page() {
   return (
@@ -11,12 +12,12 @@ export default function Page() {
               <Stethoscope className="h-8 w-8 text-white" />
             </div>
             <div>
-              <a href="/pacientes">
+              <Link href="/pacientes">
                 <h1 className="text-2xl font-bold">MediSense</h1>
                 <p className="text-sm text-blue-100">
                   Sistema de gestión de pacientes
                 </p>
-              </a>
+              </Link>
             </div>
             <div className="ml-auto hidden items-center gap-2 sm:flex">
               <Activity className="h-5 w-5 animate-pulse text-green-300" />
