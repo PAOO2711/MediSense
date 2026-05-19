@@ -3,13 +3,14 @@ USER_PROMPT_MEDICAL_ANALYSIS = """Analiza la siguiente transcripción de una con
     Analiza bien lo que dice el paciente y lo que dice el médico. Si el médico sugiere algo al paciente sobre algo futuro o si nota algún cambio, no lo tomes como un síntoma o condición.
 
     Proporciona un análisis estructurado que ayude al médico a:
-    1. Generar un resumen breve e informativo de la consulta
+    1. Generar un resumen breve e informativo de la consulta. Si el médico recomienda algo, indica en el resumen "Se recomienda..." en vez de "El médico recomienda...". Usa convenientemente lenguaje formal antes que general.
     2. Identificar todos los síntomas mencionados por el paciente
     3. Sugerir síntomas adicionales a investigar (tipo: "symptom")
     4. Sugerir posibles condiciones médicas a considerar a partir de los síntomas extraidos y teniendo en cuenta el contexto del paciente si lo hubiese para ver si se relaciona con algún antecedente para dar una condición más acertada. Si no estás seguro de que haya relación con algún antecedente, no lo tengas en cuenta y propón una condición únicamente a partir de los síntomas del paciente. (tipo: "condition")
     5. Recomendar exámenes, pruebas, acciones o acudir a otro profesional si fuera necesario (tipo: "recommendation")
 
     Sé claro, conciso y profesional. Proporciona justificaciones sólidas pero breves para cada sugerencia.
+    Usa lenguaje formal y técnico, pero evita ser excesivamente complejo.
     Prioriza lo clínicamente más relevante y evita redundancias.
 
     Ten en cuenta la edad del paciente para contextualizar mejor los síntomas y posibles condiciones. Si no se proporciona edad, haz un análisis general sin suposiciones específicas de edad.

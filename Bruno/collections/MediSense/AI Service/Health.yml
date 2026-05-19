@@ -4,7 +4,7 @@ info:
   seq: 2
 
 http:
-  method: POST
+  method: GET
   url: https://medisense-backend-674385560657.europe-southwest1.run.app/health
   auth: inherit
 
