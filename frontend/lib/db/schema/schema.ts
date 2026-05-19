@@ -1,5 +1,6 @@
-import { pgTable, pgSchema, serial, text, timestamp, integer, boolean, jsonb, uuid, numeric } from 'drizzle-orm/pg-core';
+import { pgPolicy, pgTable, pgSchema, serial, text, timestamp, integer, boolean, jsonb, uuid, numeric } from 'drizzle-orm/pg-core';
 import { relations, sql } from 'drizzle-orm';
+import { authenticatedRole } from 'drizzle-orm/supabase'
 
 const auth = pgSchema('auth');
 const authUsers = auth.table('users', {
@@ -20,6 +21,13 @@ export const patients = pgTable('patients', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 }).enableRLS();
+
+export const patientsSelectOwnPolicy = pgPolicy('patients_select_own', {
+  as: 'permissive',
+  to: authenticatedRole,
+  for: 'select',
+  using: sql`auth.uid() = ${patients.ownerId}`,
+}).link(patients);
 
 // Tabla de consultas médicas
 export const consultations = pgTable('consultations', {
@@ -82,6 +90,13 @@ export const role = pgTable('roles', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 }).enableRLS();
 
+export const rolesSelectOwnPolicy = pgPolicy('roles_select_own', {
+  as: 'permissive',
+  to: authenticatedRole,
+  for: 'select',
+  using: sql`auth.uid() = ${role.id}`,
+}).link(role);
+
 export const doctors = pgTable('doctors', {
   dni: text('dni').primaryKey().notNull(),
   id: uuid('id').notNull().unique().references(() => authUsers.id, { onDelete: 'restrict' }),
@@ -91,6 +106,20 @@ export const doctors = pgTable('doctors', {
   phone: text('phone'),
   dateOfBirth: timestamp('date_of_birth'),
 }).enableRLS();
+
+export const doctorsInsertOwnPolicy = pgPolicy('doctors_insert_own', {
+  as: 'permissive',
+  to: authenticatedRole,
+  for: 'insert',
+  withCheck: sql`auth.uid() = ${doctors.id}`,
+}).link(doctors);
+
+export const doctorsSelectOwnPolicy = pgPolicy('doctors_select_own', {
+  as: 'permissive',
+  to: authenticatedRole,
+  for: 'select',
+  using: sql`auth.uid() = ${doctors.id}`,
+}).link(doctors);
 
 // Relaciones
 export const patientsRelations = relations(patients, ({ many }) => ({

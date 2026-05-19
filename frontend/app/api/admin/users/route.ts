@@ -6,6 +6,7 @@ import {
   UnauthorizedError,
 } from '@/lib/auth/require-user';
 
+// GET /api/admin/users Obtener una lista de usuarios con paginación y búsqueda
 export async function POST(request: NextRequest) {
   try {
     await requireAdmin();

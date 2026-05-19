@@ -7,6 +7,7 @@ import {
   UnauthorizedError,
 } from '@/lib/auth/require-user';
 
+// POST /api/admin/patients Crear un nuevo paciente
 export async function POST(request: NextRequest) {
   try {
     await requireAdmin();

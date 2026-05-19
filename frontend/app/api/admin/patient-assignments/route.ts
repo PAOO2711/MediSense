@@ -17,6 +17,7 @@ type PatientResult = {
   ownerId: string;
 };
 
+// GET /api/admin/patient-assignments Obtener una lista de pacientes asignados a médicos con paginación y búsqueda
 export async function GET(request: NextRequest) {
   try {
     await requireAdmin();

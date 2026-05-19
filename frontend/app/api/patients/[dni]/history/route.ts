@@ -6,7 +6,7 @@ import {
 } from "@/lib/db/queries/index";
 import { ForbiddenError, requireDoctor, UnauthorizedError } from '@/lib/auth/require-user';
 
-// GET /api/patients/[dni]/history
+// GET /api/patients/[dni]/history Obtener el historial de un paciente por DNI
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ dni: string }> }
@@ -44,7 +44,7 @@ export async function GET(
   }
 }
 
-// POST /api/patients/[dni]/history
+// POST /api/patients/[dni]/history Crear un nuevo antecedente para un paciente
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ dni: string }> }
@@ -96,7 +96,7 @@ export async function POST(
   }
 }
 
-// PUT /api/patients/[dni]/history
+// PUT /api/patients/[dni]/history - Actualizar el estado de un antecedente (activo o resuelto)
 export async function PUT(request: NextRequest) {
   try {
     await requireDoctor();

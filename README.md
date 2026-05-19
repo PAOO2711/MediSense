@@ -29,16 +29,46 @@ medisense/
 ### Frontend (Next.js)
 ```bash
 cd frontend
-npm install
-npm run dev
+pnpm install
+pnpm dev
 ```
-- Aplicación disponible en: http://localhost:3000
+- Aplicación disponible en: http://localhost:3000 (local)
+- Consultar documentación de API http://localhost:3000/api-docs (local)
+- Aplicación disponible en: https://medi-sense-mmid.vercel.app (cloud)
+
+### Migración de base de datos con Drizzle
+El frontend usa Drizzle ORM para definir el esquema y generar migraciones para PostgreSQL.
+
+1. Configura la cadena de conexión en `frontend/.env`:
+```bash
+DATABASE_URL="postgresql://usuario:contraseña@host:5432/base_de_datos"
+```
+
+2. Genera la migración:
+```bash
+cd frontend
+drizzle-kit generate
+```
+
+3. Aplica la migración en la base de datos:
+```bash
+cd frontend
+drizzle-kit migrate
+```
+
+4. Si estás iterando localmente y quieres sincronizar el esquema sin crear archivos de migración, puedes usar:
+```bash
+cd frontend
+drizzle-kit push
+```
+
+Los archivos generados por Drizzle quedan en `frontend/drizzle/`.
 
 ### Backend (FastAPI)
 ```bash
 cd backend
 pip install -r requirements.txt
-python main.py
+python3 main.py
 ```
 - API disponible en: http://localhost:8000
 - Documentación automática: http://localhost:8000/docs
@@ -63,20 +93,3 @@ python main.py
 - API REST para datos médicos
 - Sistema de autenticación (preparado)
 - Componentes UI reutilizables
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

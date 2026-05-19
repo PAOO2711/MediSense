@@ -17,6 +17,7 @@ const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 5;
 const MAX_LIMIT = 25;
 
+// GET /api/admin/doctors Obtener una lista de médicos con paginación y búsqueda
 export async function GET(request: NextRequest) {
   try {
     await requireAdmin();
