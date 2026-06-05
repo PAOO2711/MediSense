@@ -73,23 +73,15 @@ python3 main.py
 - API disponible en: http://localhost:8000
 - Documentación automática: http://localhost:8000/docs
 
-## 🔧 Configuración
-
-### Frontend
-- Framework: Next.js 15 con TypeScript
-- UI: shadcn/ui + Tailwind CSS
-- Tema: Modo oscuro/claro con next-themes
-
-### Backend
-- Framework: FastAPI
-- Base de datos: SQLAlchemy (configurable)
-- Autenticación: JWT
-- CORS configurado para desarrollo
-
 ## 📊 Funcionalidades
 
-- Dashboard médico interactivo
-- Modo oscuro/claro
-- API REST para datos médicos
-- Sistema de autenticación (preparado)
-- Componentes UI reutilizables
+- Dashboard médico interactivo con visualizaciones y métricas de consultas.
+- Autenticación basada en JWT con roles (admin / doctor / paciente) y panel de administración.
+- Gestión de pacientes: CRUD de pacientes y datos personales.
+- Gestión de consultas: crear, editar y listar consultas médicas.
+- Transcripciones de audio: subida de audio, trascripción (ASR) y almacenamiento de resultados.
+- Análisis asistido por IA: resúmenes automáticos, sugerencias y búsqueda basada en RAG (retrieval-augmented generation).
+- Panel de administración para asignar pacientes a doctores y gestionar usuarios.
+- Búsqueda y filtrado sobre transcripciones e historiales clínicos.
+- Exportación de informes a formatos comunes (CSV / PDF) y descarga de transcripciones.
+- Componentes UI reutilizables y accesibles (Tailwind + shadcn/ui).
