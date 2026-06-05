@@ -23,6 +23,7 @@ backend/*.pyc
 frontend/.next/
 /out/
 frontend/out/
+frontend/drizzle/
 
 # production
 /build
