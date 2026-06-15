@@ -23,6 +23,7 @@ class Suggestion(BaseModel):
     confianza: float = Field(description="Nivel de confianza en la sugerencia (0 a 1)")
 
 class MedicalAnalysis(BaseModel):
+    motivo_consulta: str = Field(description="Frase breve y descriptiva del motivo de la consulta")
     resumen: str = Field(description="Resumen breve de la consulta e informativo")
     sintomas_identificados: List[Symptom] = Field(description="Síntomas mencionados por el paciente")
     sugerencias: List[Suggestion] = Field(description="Sugerencias para el médico")

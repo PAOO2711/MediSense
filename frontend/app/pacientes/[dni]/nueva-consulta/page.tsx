@@ -219,6 +219,11 @@ export default function NuevaConsultaPage({ params }: { params: Promise<{ dni: s
       if (result.analysis) {
         setLoadingSuggestions(true);
         
+        // Rellenar automáticamente el motivo de consulta si sigue vacío
+        if (!motivoConsulta?.trim() && result.analysis.motivo_consulta) {
+          setMotivoConsulta(result.analysis.motivo_consulta);
+        }
+
         // Guardar el resumen para usarlo al guardar la consulta
         if (result.analysis.resumen) {
           setAiAnalysisResumen(result.analysis.resumen);
