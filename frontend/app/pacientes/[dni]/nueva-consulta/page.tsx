@@ -49,6 +49,7 @@ export default function NuevaConsultaPage({ params }: { params: Promise<{ dni: s
   const [motivoConsulta, setMotivoConsulta] = useState('');
   const [anamnesis, setAnamnesis] = useState('');
   const [pruebasComplementarias, setPruebasComplementarias] = useState('');
+  const [recomendaciones, setRecomendaciones] = useState('');
   const [diagnostico, setDiagnostico] = useState('');
   
   // Patient history (antecedentes)
@@ -313,6 +314,7 @@ export default function NuevaConsultaPage({ params }: { params: Promise<{ dni: s
           motivoConsulta,
           anamnesis,
           pruebas: pruebasComplementarias,
+          recomendaciones,
           diagnostico,
           status: 'completed'
         })
@@ -664,6 +666,27 @@ export default function NuevaConsultaPage({ params }: { params: Promise<{ dni: s
                   placeholder="Ej: Analítica de sangre completa, Rx tórax, ECG..."
                   value={pruebasComplementarias}
                   onChange={(e) => setPruebasComplementarias(e.target.value)}
+                  className="min-h-[120px] text-base bg-white border border-gray-300 text-gray-900"
+                />
+              </CardContent>
+            </Card>
+
+            {/* Recomendaciones */}
+            <Card className="border-0 shadow-lg bg-white">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-gray-800">
+                  <FileText className="h-5 w-5 text-green-600" />
+                  Recomendaciones
+                </CardTitle>
+                <CardDescription>
+                  Indicaciones, seguimiento, derivaciones o acciones recomendadas
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Textarea
+                  placeholder="Ej: Reposo relativo, hidratación abundante, control en 48-72 h, acudir a urgencias si empeora..."
+                  value={recomendaciones}
+                  onChange={(e) => setRecomendaciones(e.target.value)}
                   className="min-h-[120px] text-base bg-white border border-gray-300 text-gray-900"
                 />
               </CardContent>
