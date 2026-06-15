@@ -283,9 +283,14 @@ export default function NuevaConsultaPage({ params }: { params: Promise<{ dni: s
   };
 
   const addSuggestionToAnamnesis = (suggestion: AISuggestion) => {
+    const suggestionText =
+      suggestion.source === 'identified' && suggestion.description?.trim()
+        ? `${suggestion.text} (${suggestion.description.trim()})`
+        : suggestion.text;
+
     const newText = anamnesis 
-      ? `${anamnesis}\n• ${suggestion.text}`
-      : `• ${suggestion.text}`;
+      ? `${anamnesis}\n• ${suggestionText}`
+      : `• ${suggestionText}`;
     setAnamnesis(newText);
     
     // Remove the suggestion from the list

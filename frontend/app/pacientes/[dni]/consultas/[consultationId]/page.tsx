@@ -339,27 +339,6 @@ export default function ConsultaDetailPage({
               </CardContent>
             </Card>
 
-            {/* Diagnóstico */}
-            <Card className="border-0 shadow-lg bg-white">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-gray-800">
-                  <Brain className="h-5 w-5 text-indigo-600" />
-                  Diagnóstico
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {consultation.diagnostico ? (
-                  <p className="text-gray-900 text-base whitespace-pre-wrap">
-                    {consultation.diagnostico}
-                  </p>
-                ) : (
-                  <p className="text-gray-500 text-sm italic">
-                    No se registró diagnóstico
-                  </p>
-                )}
-              </CardContent>
-            </Card>
-
             {/* Recomendaciones */}
             <Card className="border-0 shadow-lg bg-white">
               <CardHeader>
@@ -376,6 +355,27 @@ export default function ConsultaDetailPage({
                 ) : (
                   <p className="text-gray-500 text-sm italic">
                     No se registraron recomendaciones
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Diagnóstico */}
+            <Card className="border-0 shadow-lg bg-white">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-gray-800">
+                  <Brain className="h-5 w-5 text-indigo-600" />
+                  Diagnóstico
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {consultation.diagnostico ? (
+                  <p className="text-gray-900 text-base whitespace-pre-wrap">
+                    {consultation.diagnostico}
+                  </p>
+                ) : (
+                  <p className="text-gray-500 text-sm italic">
+                    No se registró diagnóstico
                   </p>
                 )}
               </CardContent>
