@@ -26,6 +26,12 @@ medisense/
 
 ## 🚀 Desarrollo
 
+Instalación general
+
+```bash
+sudo apt update
+sudo apt install -y ffmpeg
+```
 ### Frontend (Next.js)
 ```bash
 cd frontend
