@@ -283,17 +283,30 @@ export default function NuevaConsultaPage({ params }: { params: Promise<{ dni: s
     console.log('AI suggestions are now generated automatically during transcription');
   };
 
-  const addSuggestionToAnamnesis = (suggestion: AISuggestion) => {
+  const addSuggestionToField = (
+    suggestion: AISuggestion,
+    currentValue: string,
+    setValue: (value: string) => void
+  ) => {
     const suggestionText =
       suggestion.source === 'identified' && suggestion.description?.trim()
         ? `${suggestion.text} (${suggestion.description.trim()})`
         : suggestion.text;
 
-    const newText = anamnesis 
-      ? `${anamnesis}\n• ${suggestionText}`
+    const newText = currentValue
+      ? `${currentValue}\n• ${suggestionText}`
       : `• ${suggestionText}`;
-    setAnamnesis(newText);
-    
+
+    setValue(newText);
+  };
+
+  const addSuggestionToAnamnesis = (suggestion: AISuggestion) => {
+    if (suggestion.type === 'recommendation') {
+      addSuggestionToField(suggestion, recomendaciones, setRecomendaciones);
+    } else {
+      addSuggestionToField(suggestion, anamnesis, setAnamnesis);
+    }
+
     // Remove the suggestion from the list
     setAiSuggestions(prev => prev.filter(s => s.id !== suggestion.id));
   };
