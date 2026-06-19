@@ -15,8 +15,8 @@ from app.prompts.user_prompts import USER_PROMPT_MEDICAL_ANALYSIS, USER_RAG_PROM
 logger = logging.getLogger(__name__)
 
 MAX_TRANSCRIPTION_CHARS = 5000
-MAX_RAG_CASES = 2
-MAX_RAG_CASE_CHARS = 500
+MAX_RAG_CASES = 4
+MAX_RAG_CASE_CHARS = 800
 MAX_CONTEXT_SECTION_CHARS = 1400
 
 """ document = Document(

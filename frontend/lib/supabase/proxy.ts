@@ -51,6 +51,15 @@ export async function updateSession(request: NextRequest) {
 
   const isAdmin = role === 'admin'
   const pathname = request.nextUrl.pathname
+  const isDevelopment = process.env.NODE_ENV === 'development'
+  
+  // En producción, bloquear acceso a /register
+  if (!isDevelopment && pathname.startsWith('/register')) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/login'
+    return NextResponse.redirect(url)
+  }
+  
   const isAuthPage = pathname === '/' || pathname.startsWith('/login') || pathname.startsWith('/register')
 
   // Si hay usuario y está en login/register, redirigir según rol.

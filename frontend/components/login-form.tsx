@@ -43,6 +43,7 @@ export function LoginForm({
   ...props
 }: React.ComponentProps<"div">) {
   const [state, formAction] = useActionState(login, null)
+  const isDevelopment = process.env.NODE_ENV === 'development'
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -124,12 +125,14 @@ export function LoginForm({
                   {state.error}
                 </p>
               )}
-              <FieldDescription className="text-center text-slate-500">
-                No tienes una cuenta?{" "}
-                <a href="/register" className="text-teal-600 hover:text-teal-800">
-                  Solicitar acceso
-                </a>
-              </FieldDescription>
+              {isDevelopment && (
+                <FieldDescription className="text-center text-slate-500">
+                  No tienes una cuenta?{" "}
+                  <a href="/register" className="text-teal-600 hover:text-teal-800">
+                    Solicitar acceso
+                  </a>
+                </FieldDescription>
+              )}
             </div>
           </form>
 
